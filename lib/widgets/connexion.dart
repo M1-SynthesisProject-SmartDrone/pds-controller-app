@@ -1,10 +1,16 @@
+import 'package:droneapp/classes/NetworkControl.dart';
 import 'package:droneapp/widgets/navigationSelection.dart';
 import 'package:flutter/material.dart';
 
+import '../classes/DroneCommunication.dart';
+
 class Connexion extends StatelessWidget{
 
-  const Connexion({Key? key}) : super(key: key);
+  Connexion({Key? key}) : super(key: key);
 
+  final ipText = TextEditingController();
+  final portText = TextEditingController();
+  final DroneCommunication droneCommunication= DroneCommunication();
   @override
   Widget build(BuildContext context) {
 
@@ -18,6 +24,7 @@ class Connexion extends StatelessWidget{
             Text('Entrer l\'IP et le port du serveur distant', style: TextStyle(fontSize: 15, color: Colors.black),),
             TextField(
               obscureText: false,
+              controller: ipText,
               decoration: InputDecoration(
                 border: OutlineInputBorder(),
                 labelText: 'Adresse IP',
@@ -25,6 +32,7 @@ class Connexion extends StatelessWidget{
             ),
             TextField(
               obscureText: false,
+              controller: portText,
               decoration: InputDecoration(
                 border: OutlineInputBorder(),
                 labelText: 'Port',
@@ -36,7 +44,14 @@ class Connexion extends StatelessWidget{
                   backgroundColor: MaterialStateProperty.all<Color>(Colors.blue)
               ),
               onPressed: () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) => const NavigationSelection()));
+                print(portText.text);
+
+                bool isConnected = droneCommunication.connect(ipText.text, portText.text);
+                if(isConnected){
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => const NavigationSelection()));
+
+                }
+
               },
               child: Text('Se connecter'),
             )

@@ -36,6 +36,8 @@ dependencies:
   cupertino_icons: ^1.0.2
   joystick: ^1.1.0
   control_pad: ^1.1.1+1
+  udp: ^5.0.1
+  gson: ^0.1.4
 
 dev_dependencies:
   flutter_test:
