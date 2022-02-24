@@ -32,5 +32,8 @@ class StartRequest{
     this.startDrone = startDrone;
   }
 
+  Map toJson() =>{
+    'startDrone' : startDrone,
+  };
 
 }

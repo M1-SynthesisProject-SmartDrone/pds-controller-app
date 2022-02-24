@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:droneapp/classes/CommunicationAPI/AnswerRequest.dart';
@@ -15,14 +16,27 @@ class DroneCommunication{
 
   DroneCommunication();
 
-  bool connect(String address, String port) {
+  Future<bool> connect(String address, String port) async {
 
     InternetAddress addressval = InternetAddress(address, type: InternetAddressType.any);
     int portval = int.parse(port);
 
     networkControl = NetworkControl(addressval, portval);
-    Future<bool> isConnected = networkControl.connect();
-    return true;
+    await networkControl.connect();
+
+    Object val = StartRequest(true);
+
+    Request request = RequestImpl(RequestType.STARTDRONE, jsonEncode(val));
+
+
+    print(request.getRequest());
+
+    networkControl.sendData(request);
+    Request req = networkControl.getData();
+
+    AnswerRequest answer = AnswerRequest(req);
+
+    return answer.validated;
   }
 
 }

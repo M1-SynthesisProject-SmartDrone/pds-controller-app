@@ -43,11 +43,12 @@ class Connexion extends StatelessWidget{
                   foregroundColor: MaterialStateProperty.all<Color>(Colors.white),
                   backgroundColor: MaterialStateProperty.all<Color>(Colors.blue)
               ),
-              onPressed: () {
+              onPressed: () async {
                 print(portText.text);
 
-                bool isConnected = droneCommunication.connect(ipText.text, portText.text);
-                if(isConnected){
+                bool isconnected = await droneCommunication.connect(ipText.text, portText.text);
+
+                if(isconnected ){
                   Navigator.push(context, MaterialPageRoute(builder: (context) => const NavigationSelection()));
 
                 }

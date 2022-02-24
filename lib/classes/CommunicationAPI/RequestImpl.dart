@@ -26,7 +26,7 @@ class RequestImpl extends Request{
     Gson gson = Gson();
     GsonEncoder encoder = gson.encoder;
 
-    request+=encoder.encode(request);
+    request+=encoder.encode(content);
     request+="};";
 
     return request;

@@ -21,41 +21,22 @@ class NetworkControl{
 
   }
 
-  Future<bool> connect({int duration = 500}) async {
-    await RawDatagramSocket.bind( address, port).then((value) {
-      socket = value;
-      Duration dur = Duration(milliseconds: duration);
-      socket.timeout(dur);
-
-    }).catchError((onError) => print("Error : " + onError.toString()));
-
-    return socket.isEmpty;
+  Future<void> connect({int duration = 500}) async {
+    socket = await RawDatagramSocket.bind( InternetAddress.anyIPv4, port);
+    socket.timeout(Duration(milliseconds: duration));
   }
 
   void sendData(Request request) async {
     var codec = new Utf8Codec();
     List<int> data = codec.encode(request.getRequest());
-    await socket.send(data, address, port);
+    socket.send(data, address, port);
   }
 
-  Request? getData(){
-    socket.listen((event) {
-          (Uint8List data) {
-        final serverResponse = String.fromCharCodes(data);
-        Request req = ProjectUtils.receiveRequest(data.toString());
-        return req;
-      };
+  Request getData()  {
+      Datagram? data = socket.receive();
+      Request request = ProjectUtils.receiveRequest(jsonDecode(data.toString()));
+      return request;
 
-      // handle errors
-      onError: (error) {
-        return null;
-      };
-
-      // handle server ending connection
-      onDone: () {
-        return null;
-      };
-    });
     }
 
 
