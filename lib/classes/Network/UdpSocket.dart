@@ -11,13 +11,15 @@ class UdpSocket {
   /// A view on events passing by RawDatagramSocket
   final StreamQueue _streamQueue;
 
-  UdpSocket(this.datagramSocket) : _streamQueue = StreamQueue(datagramSocket);
+  UdpSocket(this.datagramSocket) : _streamQueue = StreamQueue(datagramSocket) {}
 
   /// Bind a socket on a specific port
-  /// If 'host' is not defined, InternetAddress.anyIPv4 will be used
+  ///
+  /// If "host" is not defined, InternetAddress.anyIPv4 will be used
   static Future<UdpSocket> bind(int port, {dynamic host, bool reuseAddress = false, bool reusePort = false}) async {
     dynamic hostUsed = host ?? InternetAddress.anyIPv4;
     var socket = await RawDatagramSocket.bind(hostUsed, port, reusePort: reusePort, reuseAddress: reuseAddress);
+
     return UdpSocket(socket);
   }
 
@@ -38,6 +40,7 @@ class UdpSocket {
   }
 
   /// Receive a datagram from the rawDatagramSocket
+  ///
   /// If the timeout is set, the Future will throw an error if no message is received in the allotted time.
   Future<Datagram> receive({Duration? timeout}) {
     // This Completer permits to use future in callbacks used by RawDatagramSocket
@@ -60,32 +63,52 @@ class UdpSocket {
     // over the callback tasks (The Future.delayed just before for example)
     Future.microtask(() async {
       try {
-        RawSocketEvent event = await _streamQueue.peek;
-        switch (event) {
-          case RawSocketEvent.read:
-            if (completer.isCompleted) {
-              return; // Could happen if we have an error or the timeout exceeded just before
-            } else {
-              // We actually received the message, yeah !
-              completer.complete(datagramSocket.receive());
-            }
-            break;
-          case RawSocketEvent.closed:
-            // This should not happen, but it is always good to plan ahead
-            if (completer.isCompleted) {
-              return;
-            } else {
-              completer.completeError("Socket closed during waiting for receive");
-            }
-            break;
-          default:
-            // We don't care about the current event. Wait for the next event to come
-            await _streamQueue.next;
+        while (true) {
+          RawSocketEvent event = await _streamQueue.peek;
+          switch (event) {
+            case RawSocketEvent.read:
+              if (completer.isCompleted) {
+                return; // Could happen if we have an error or the timeout exceeded just before
+              } else {
+                // We actually received the message, yeah !
+                var datagram = datagramSocket.receive();
+                if (datagram == null) {
+                  completer.completeError("Received null datagram");
+                }
+                completer.complete(datagram);
+              }
+              break;
+            case RawSocketEvent.closed:
+              // This should not happen, but it is always good to plan ahead
+              if (completer.isCompleted) {
+                return;
+              } else {
+                completer.completeError("Socket closed during waiting for receive");
+              }
+              break;
+            default:
+              // We don't care about the current event. Wait for the next event to come
+              await _streamQueue.next;
+          }
         }
       } catch (e) {
         developer.log("Error while receiving message : $e", name: "udp.socket");
       }
     });
     return completer.future as Future<Datagram>;
+  }
+
+  /// Close the socket and waits until this socket is closed
+  Future<void> closeSocket() async {
+    try {
+      datagramSocket.close();
+      // Wait until we have the close event and "destroy" the streamQueue
+      while (await _streamQueue.peek != RawSocketEvent.closed) {
+        await _streamQueue.next;
+      }
+      await _streamQueue.cancel();
+    } catch (e) {
+      throw SocketException("Error while closing socket : $e");
+    }
   }
 }

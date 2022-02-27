@@ -12,7 +12,7 @@ class Connection extends StatelessWidget {
     return MaterialApp(
       // Column is a vertical, linear layout.
       home: Scaffold(
-        appBar: AppBar(title: Text("Drone Controller"),),
+        appBar: AppBar(title: const Text("Drone Controller"),),
 
         body: Column(
           mainAxisAlignment: MainAxisAlignment.center,

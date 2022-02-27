@@ -1,6 +1,4 @@
-import 'dart:convert';
 import 'dart:developer' as developer;
-import 'dart:io';
 
 import 'package:droneapp/classes/CommunicationAPI/requests/AckRequest.dart';
 import 'package:droneapp/classes/CommunicationAPI/requests/Request.dart';
@@ -19,19 +17,25 @@ class DroneCommunication {
   Future<void> connect(String address, String port) async {
     networkControl = NetworkControl(address, int.parse(port));
     await networkControl.connect();
+    try {
+      Request request = AckRequest();
+      developer.log("Request : " + request.toJsonString());
 
-    Request request = AckRequest();
-    developer.log("Request : " + request.toJsonString());
-
-    networkControl.sendRequest(request);
-    Response response = await networkControl.receiveResponse();
-    if (response.responseType != ResponseTypes.ANSWER) {
-      return Future.error("error");
-    }
-    AnswerResponse answer = response as AnswerResponse;
-    if (!answer.validated) {
-      // Should never happen
-      return Future.error("Server does not validate the acknowledgement");
+      networkControl.sendRequest(request);
+      Response response = await networkControl.receiveResponse(timeout: const Duration(seconds: 10));
+      if (response.responseType != ResponseTypes.ANSWER) {
+        return Future.error("error");
+      }
+      AnswerResponse answer = response as AnswerResponse;
+      if (!answer.validated) {
+        // Should never happen
+        return Future.error("Server does not validate the acknowledgement");
+      }
+    } catch (e) {
+      developer.log("Error while ack", error: e);
+      return Future.error(e.toString());
+    } finally {
+      networkControl.close();
     }
   }
 }

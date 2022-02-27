@@ -1,66 +1,40 @@
-import 'dart:collection';
 import 'dart:convert';
 import 'dart:io';
-import 'dart:typed_data';
 import 'dart:developer' as developer;
 
 import 'package:droneapp/classes/CommunicationAPI/responses/Response.dart';
 import 'package:droneapp/classes/CommunicationAPI/responses/ResponseConverter.dart';
-import 'package:droneapp/classes/ProjectUtils.dart';
-import 'package:udp/udp.dart';
+import 'package:droneapp/classes/Network/UdpSocket.dart';
 
 import 'CommunicationAPI/requests/Request.dart';
 
 class NetworkControl {
-  late InternetAddress address;
-  late Port port;
-  late UDP udpSocket;
-  late RawDatagramSocket socket;
+  final InternetAddress address;
+  final int port;
 
-  final Queue<Response> responseQueue = Queue();
+  late UdpSocket udpSocket;
 
-  NetworkControl(String ipAddress, int port) {
-    address = InternetAddress(ipAddress, type: InternetAddressType.any);
-    this.port = Port(port);
+  NetworkControl(String ipAddress, this.port) : address = InternetAddress(ipAddress, type: InternetAddressType.any) {
     developer.log(address.toString() + " " + port.toString(), name: "network.control");
   }
 
-  Future<void> connect({int duration = 500}) async {
-    udpSocket = await UDP.bind(Endpoint.any(port: port));
-    socket = await RawDatagramSocket.bind(InternetAddress.anyIPv4, port.value);
+  Future<void> connect() async {
+    udpSocket = await UdpSocket.bind(port);
   }
 
-  void sendRequest(Request request) {
+  Future<int> sendRequest(Request request) async {
     const codec = Utf8Codec();
     List<int> data = codec.encode(request.toJsonString());
-    socket.send(data, address, port.value);
-    // int responseCode = await udpSocket.send(data, Endpoint.unicast(address, port: port));
-    // if (responseCode == -1) {
-    //   throw const SocketException("Udp socket already closed");
-    // }
+    return await udpSocket.send(data, address, port);
   }
 
-  Future<Response> receiveResponse() async {
-    // udpSocket.asStream()
-    Datagram? data = socket.receive();
-    if (data == null) {
-      return Future.error("Error while receiving the data");
-    }
-    Response response = ResponseConverter.convertString(data.toString());
+  Future<Response> receiveResponse({Duration? timeout}) async {
+    Datagram datagram = await udpSocket.receive(timeout: timeout);
+    Response response = ResponseConverter.convertString(String.fromCharCodes(datagram.data));
     return Future.value(response);
   }
 
-  // Future<Response> sendRequestWaitResponse(Request request) async {
-  //   sendRequest(request);
-  //   var wait = RawDatagramSocket.bind(InternetAddress.anyIPv4, port.value)
-  //     .then((datagramSocket) {
-  //       datagramSocket.listen((event) {
-  //         switch(event) {
-  //           case RawSocketEvent.read:
-  //             Datagram datagram = datagramSocket.receive();
-  //         }
-  //       });
-  //     }
-  //     );
-  // }
+  Future<void> close() async {
+    await udpSocket.closeSocket();
+  }
 }
