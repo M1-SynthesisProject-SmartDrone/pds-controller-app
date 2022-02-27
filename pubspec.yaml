@@ -38,6 +38,7 @@ dependencies:
   control_pad: ^1.1.1+1
   udp: ^5.0.1
   gson: ^0.1.4
+  async: ^2.8.2
 
 dev_dependencies:
   flutter_test:

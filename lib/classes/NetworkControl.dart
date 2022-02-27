@@ -49,4 +49,18 @@ class NetworkControl {
     Response response = ResponseConverter.convertString(data.toString());
     return Future.value(response);
   }
+
+  // Future<Response> sendRequestWaitResponse(Request request) async {
+  //   sendRequest(request);
+  //   var wait = RawDatagramSocket.bind(InternetAddress.anyIPv4, port.value)
+  //     .then((datagramSocket) {
+  //       datagramSocket.listen((event) {
+  //         switch(event) {
+  //           case RawSocketEvent.read:
+  //             Datagram datagram = datagramSocket.receive();
+  //         }
+  //       });
+  //     }
+  //     );
+  // }
 }
