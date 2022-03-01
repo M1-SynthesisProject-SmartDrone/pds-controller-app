@@ -1,42 +1,41 @@
-import 'dart:convert';
-import 'dart:io';
+import 'dart:developer' as developer;
 
-import 'package:droneapp/classes/CommunicationAPI/AnswerRequest.dart';
-import 'package:droneapp/classes/CommunicationAPI/RequestImpl.dart';
-import 'package:droneapp/classes/CommunicationAPI/RequestTypes.dart';
-import 'package:droneapp/classes/CommunicationAPI/StartRequest.dart';
+import 'package:droneapp/classes/CommunicationAPI/requests/AckRequest.dart';
+import 'package:droneapp/classes/CommunicationAPI/requests/Request.dart';
+import 'package:droneapp/classes/CommunicationAPI/responses/AnswerResponse.dart';
+import 'package:droneapp/classes/CommunicationAPI/responses/Response.dart';
+import 'package:droneapp/classes/CommunicationAPI/responses/ResponseTypes.dart';
 import 'package:droneapp/classes/NetworkControl.dart';
-import 'package:gson/gson.dart';
 
-import 'CommunicationAPI/Request.dart';
-
-class DroneCommunication{
-
+class DroneCommunication {
   late NetworkControl networkControl;
 
   DroneCommunication();
 
-  Future<bool> connect(String address, String port) async {
-
-    InternetAddress addressval = InternetAddress(address, type: InternetAddressType.any);
-    int portval = int.parse(port);
-
-    networkControl = NetworkControl(addressval, portval);
+  /// Send a acknowledgement message to the server and waits for the response
+  /// Does not return anything, but can throw errors if connection is not well made
+  Future<void> connect(String address, String port) async {
+    networkControl = NetworkControl(address, int.parse(port));
     await networkControl.connect();
+    try {
+      Request request = AckRequest();
+      developer.log("Request : " + request.toJsonString());
 
-    Object val = StartRequest(true);
-
-    Request request = RequestImpl(RequestType.STARTDRONE, jsonEncode(val));
-
-
-    print(request.getRequest());
-
-    networkControl.sendData(request);
-    Request req = networkControl.getData();
-
-    AnswerRequest answer = AnswerRequest(req);
-
-    return answer.validated;
+      networkControl.sendRequest(request);
+      Response response = await networkControl.receiveResponse(timeout: const Duration(seconds: 10));
+      if (response.responseType != ResponseTypes.ANSWER) {
+        return Future.error("error");
+      }
+      AnswerResponse answer = response as AnswerResponse;
+      if (!answer.validated) {
+        // Should never happen
+        return Future.error("Server does not validate the acknowledgement");
+      }
+    } catch (e) {
+      developer.log("Error while ack", error: e);
+      return Future.error(e.toString());
+    } finally {
+      networkControl.close();
+    }
   }
-
 }

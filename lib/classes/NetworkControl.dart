@@ -1,43 +1,40 @@
 import 'dart:convert';
 import 'dart:io';
-import 'dart:typed_data';
+import 'dart:developer' as developer;
 
-import 'package:droneapp/classes/CommunicationAPI/RequestImpl.dart';
-import 'package:droneapp/classes/ProjectUtils.dart';
-import 'package:udp/udp.dart';
+import 'package:droneapp/classes/CommunicationAPI/responses/Response.dart';
+import 'package:droneapp/classes/CommunicationAPI/responses/ResponseConverter.dart';
+import 'package:droneapp/classes/Network/UdpSocket.dart';
 
-import 'CommunicationAPI/Request.dart';
+import 'CommunicationAPI/requests/Request.dart';
 
-class NetworkControl{
+class NetworkControl {
+  final InternetAddress address;
+  final int port;
 
-  late InternetAddress address;
-  late int port;
-  late RawDatagramSocket socket;
+  late UdpSocket udpSocket;
 
-  NetworkControl(InternetAddress address, int port){
-    this.address =address;
-    this.port = port;
-    print(address.toString() + " " + port.toString());
-
+  NetworkControl(String ipAddress, this.port) : address = InternetAddress(ipAddress, type: InternetAddressType.any) {
+    developer.log(address.toString() + " " + port.toString(), name: "network.control");
   }
 
-  Future<void> connect({int duration = 500}) async {
-    socket = await RawDatagramSocket.bind( InternetAddress.anyIPv4, port);
-    socket.timeout(Duration(milliseconds: duration));
+  Future<void> connect() async {
+    udpSocket = await UdpSocket.bind(port);
   }
 
-  void sendData(Request request) async {
-    var codec = new Utf8Codec();
-    List<int> data = codec.encode(request.getRequest());
-    socket.send(data, address, port);
+  Future<int> sendRequest(Request request) async {
+    const codec = Utf8Codec();
+    List<int> data = codec.encode(request.toJsonString());
+    return await udpSocket.send(data, address, port);
   }
 
-  Request getData()  {
-      Datagram? data = socket.receive();
-      Request request = ProjectUtils.receiveRequest(jsonDecode(data.toString()));
-      return request;
+  Future<Response> receiveResponse({Duration? timeout}) async {
+    Datagram datagram = await udpSocket.receive(timeout: timeout);
+    Response response = ResponseConverter.convertString(String.fromCharCodes(datagram.data));
+    return Future.value(response);
+  }
 
-    }
-
-
+  Future<void> close() async {
+    await udpSocket.closeSocket();
+  }
 }

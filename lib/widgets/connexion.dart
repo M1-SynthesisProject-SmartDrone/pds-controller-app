@@ -1,6 +1,8 @@
 import 'package:droneapp/classes/NetworkControl.dart';
 import 'package:droneapp/widgets/navigationSelection.dart';
+import 'package:droneapp/widgets/util/ToastUtil.dart';
 import 'package:flutter/material.dart';
+import 'dart:developer' as developer;
 
 import '../classes/DroneCommunication.dart';
 
@@ -21,19 +23,19 @@ class Connexion extends StatelessWidget{
 
           children: [
 
-            Text('Entrer l\'IP et le port du serveur distant', style: TextStyle(fontSize: 15, color: Colors.black),),
+            const Text('Enter the IP address of the server', style: TextStyle(fontSize: 15, color: Colors.black),),
             TextField(
               obscureText: false,
               controller: ipText,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 border: OutlineInputBorder(),
-                labelText: 'Adresse IP',
+                labelText: 'IP address',
               ),
             ),
             TextField(
               obscureText: false,
               controller: portText,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 border: OutlineInputBorder(),
                 labelText: 'Port',
               ),
@@ -43,24 +45,17 @@ class Connexion extends StatelessWidget{
                   foregroundColor: MaterialStateProperty.all<Color>(Colors.white),
                   backgroundColor: MaterialStateProperty.all<Color>(Colors.blue)
               ),
-              onPressed: () async {
-                print(portText.text);
-
-                bool isconnected = await droneCommunication.connect(ipText.text, portText.text);
-
-                if(isconnected ){
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => const NavigationSelection()));
-
-                }
-
+              onPressed: () {
+                developer.log(portText.text);
+                droneCommunication.connect(ipText.text, portText.text)
+                  .then((void _) => Navigator.push(context, MaterialPageRoute(builder: (context) => const NavigationSelection())))
+                  .catchError((e) => ToastUtil.showToast(context, "Error while connecting : " + e.toString()));
               },
-              child: Text('Se connecter'),
+              child: const Text('Connect'),
             )
-
           ],
         ),
       );
-    // TODO: implement build
   }
   
 }
