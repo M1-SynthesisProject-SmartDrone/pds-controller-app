@@ -1,8 +1,16 @@
+import 'dart:math';
+import 'dart:ui';
+import 'dart:ui';
+
+import 'package:control_pad/models/gestures.dart';
 import 'package:control_pad/models/pad_button_item.dart';
 import 'package:droneapp/classes/DroneControl.dart';
 import 'package:droneapp/widgets/connexion.dart';
+import 'package:droneapp/widgets/util/ToastUtil.dart';
 import 'package:flutter/material.dart';
 import 'package:control_pad/control_pad.dart';
+import 'package:flutter/painting.dart';
+import '../classes/DroneCommunication.dart';
 import '../main.dart';
 
 
@@ -16,22 +24,149 @@ class JoyStick extends StatefulWidget {
 
 
 class _JoystickState extends State{
+  final DroneCommunication droneCommunication= DroneCommunication();
   DroneControl control = DroneControl();
+  double PI = 3.141592653589793238;
 
-  void _increment(){
+
+  Color armButtonColor = Colors.red;
+  Color recordButtonColor = Colors.red;
+
+
+  void _switchArm(){
     setState(() {
-      control.position++;
+      control.switchArm();
+      if (control.isArmed == true) {
+        armButtonColor = Colors.blue;
+        droneCommunication.armDrone()
+            .then((void _) {
+              armButtonColor = Colors.green;
+              print("control arm -> " + control.isArmed.toString());
+              (context as Element).reassemble();
+            })
+            .catchError((e) {
+          ToastUtil.showToast(context, "Error while Arming Drone : " + e.toString());
+          armButtonColor = Colors.red;
+          control.unArm();
+          print("control arm -> " + control.isArmed.toString());
+          (context as Element).reassemble();
+        });
+      }
+      else {
+        armButtonColor = Colors.blue;
+        droneCommunication.disarmDrone()
+            .then((void _) {
+          armButtonColor = Colors.red;
+          print("control arm -> " + control.isArmed.toString());
+          (context as Element).reassemble();
+        })
+            .catchError((e) {
+          ToastUtil.showToast(context, "Error while Arming Drone : " + e.toString());
+          armButtonColor = Colors.green;
+          control.arm();
+          print("control arm -> " + control.isArmed.toString());
+          (context as Element).reassemble();
+        });
+      }
     });
   }
 
-  void _decrement(){
+  void _switchRecord(){
     setState(() {
-      control.position--;
+      control.switchRecording();
+      if (control.isRecording == true) {
+        recordButtonColor = Colors.blue;
+        droneCommunication.startRecording()
+            .then((void _) {
+          recordButtonColor = Colors.green;
+          print("control arm -> " + control.isRecording.toString());
+          (context as Element).reassemble();
+        })
+            .catchError((e) {
+          ToastUtil.showToast(context, "Error while Starting Record: " + e.toString());
+          recordButtonColor = Colors.red;
+          control.endRecord();
+          print("control rec -> " + control.isRecording.toString());
+          (context as Element).reassemble();
+        });
+      }
+      else {
+        recordButtonColor = Colors.blue;
+        droneCommunication.endRecording()
+            .then((void _) {
+          recordButtonColor = Colors.red;
+          print("control arm -> " + control.isRecording.toString());
+          (context as Element).reassemble();
+        })
+            .catchError((e) {
+          ToastUtil.showToast(context, "Error while Ending Record: " + e.toString());
+          recordButtonColor = Colors.green;
+          control.startRecord();
+          print("control rec -> " + control.isRecording.toString());
+          (context as Element).reassemble();
+        });
+      }
     });
   }
+
+
 
   @override
   Widget build(BuildContext context) {
+
+    void droneDirection(
+        double degrees, double distance){
+      // print(degrees.toString() + " --- "+distance.toString() );
+      control.setDirection(distance*cos( (degrees*PI)/180 ), distance*sin( (degrees*PI)/180));
+      print(control);
+    }
+
+
+
+    void droneController(int buttonIndex, Gestures gesture) {
+      if(buttonIndex == 0){
+        print("right");
+        if(gesture == Gestures.TAPDOWN){
+          control.rotateRight();
+        }
+        else if(gesture == Gestures.LONGPRESSUP || gesture == Gestures.TAPUP ){
+          control.resetRotation();
+        }
+      }
+      else if(buttonIndex == 1){
+        print("down");
+        if(gesture == Gestures.TAPDOWN){
+          control.moveDown();
+        }
+        else if(gesture == Gestures.LONGPRESSUP|| gesture == Gestures.TAPUP){
+          control.resetVertical();
+        }
+      }
+      else if(buttonIndex == 2){
+        print("left");
+        if(gesture == Gestures.TAPDOWN){
+          control.rotateRight();
+        }
+        else if(gesture == Gestures.LONGPRESSUP|| gesture == Gestures.TAPUP){
+          control.resetRotation();
+
+        }
+      }
+      else if(buttonIndex == 3){
+        print("up");
+
+        if(gesture == Gestures.TAPDOWN){
+          control.moveUp();
+          print("push");
+
+        }
+        else if(gesture == Gestures.LONGPRESSUP|| gesture == Gestures.TAPUP){
+          control.resetVertical();
+          print("release");
+        }
+      }
+      print(control);
+    }
     // Material is a conceptual piece
     // of paper on which the UI appears.
     return Container(
@@ -69,46 +204,79 @@ class _JoystickState extends State{
 
               children: [
                 SizedBox(height: 70),// <-- Set height
-                new RotatedBox(quarterTurns: -1, child: PadButtonsView(
+                RotatedBox(quarterTurns: -1, child: PadButtonsView(
                   backgroundPadButtonsColor: Colors.grey,
                   buttonsPadding: 8,
+                  padButtonPressedCallback: droneController,
                   buttons: [
                     PadButtonItem(
-                      index: 0,
-                      buttonIcon: Icon(Icons.arrow_right, size: 30,),
-                      backgroundColor: Colors.lightBlue,
+                        index: 0,
+                        buttonIcon: Icon(Icons.arrow_right, size: 30,),
+                        backgroundColor: Colors.lightBlue,
+                        supportedGestures: [
+                          Gestures.TAPDOWN,
+                          Gestures.LONGPRESSUP,
+                          Gestures.TAPUP
+                        ]
+
                     ),
                     PadButtonItem(
                         index: 1,
                         buttonIcon: Icon(Icons.arrow_downward, size: 30,),
                         backgroundColor: Colors.red,
-                        pressedColor: Colors.redAccent
+                        pressedColor: Colors.redAccent,
+                        supportedGestures: [
+                          Gestures.TAPDOWN,
+                          Gestures.LONGPRESSUP,
+                          Gestures.TAPUP
+                        ]
                     ),
                     PadButtonItem(
-                      index: 2,
-                      buttonIcon: Icon(Icons.arrow_left, size: 30,),
-                      backgroundColor: Colors.lightBlue,
+                        index: 2,
+                        buttonIcon: Icon(Icons.arrow_left, size: 30,),
+                        backgroundColor: Colors.lightBlue,
+                        supportedGestures: [
+                          Gestures.TAPDOWN,
+                          Gestures.LONGPRESSUP,
+                          Gestures.TAPUP
+                        ]
                     ),
                     PadButtonItem(
                         index: 3,
                         buttonIcon: Icon(Icons.arrow_upward, size: 30,),
                         backgroundColor: Colors.green,
-                        pressedColor: Colors.greenAccent
+                        pressedColor: Colors.greenAccent,
+                        supportedGestures: [
+                          Gestures.TAPDOWN,
+                          Gestures.LONGPRESSUP,
+                          Gestures.TAPUP
+                        ]
+
                     )
 
                   ],
                 )),
-                SizedBox(height: 100),
+                const SizedBox(height: 100),
                 Row(
                   children: [
-                    new RotatedBox(quarterTurns: -1, child:ElevatedButton(onPressed: _increment, child: new Text("Record"))),
-                    new RotatedBox(quarterTurns: -1, child:ElevatedButton(onPressed: _decrement, child: new Text("Arm"))),
-                    new RotatedBox(quarterTurns: -1, child:ElevatedButton(onPressed: (){ Navigator.pop(context); }, child: Icon(Icons.arrow_back_sharp))),
+                    RotatedBox(quarterTurns: -1, child:TextButton(onPressed: _switchRecord,  style: ButtonStyle(
+                        foregroundColor: MaterialStateProperty.all<Color>(Colors.white),
+                        backgroundColor: MaterialStateProperty.all<Color>(recordButtonColor)
+                    ),child: new Text("Record")),),
+                    RotatedBox(quarterTurns: -1, child:TextButton(onPressed: _switchArm,
+                        style: ButtonStyle(
+                            foregroundColor: MaterialStateProperty.all<Color>(Colors.white),
+                            backgroundColor: MaterialStateProperty.all<Color>(armButtonColor)
+                        ),child: new Text("Arm"))),
+                    RotatedBox(quarterTurns: -1, child:TextButton(onPressed: (){ Navigator.pop(context); }, child: Icon(Icons.arrow_back_sharp))),
 
                   ],
                 ),// <-- Set height
-                SizedBox(height: 100), // <-- Set height
-                new RotatedBox(quarterTurns: -1, child: JoystickView()),
+                const SizedBox(height: 100), // <-- Set height
+                RotatedBox(quarterTurns: -1, child: JoystickView(
+                  onDirectionChanged: droneDirection,
+                  interval: Duration(milliseconds: 100),
+                )),
 
               ],
             )],

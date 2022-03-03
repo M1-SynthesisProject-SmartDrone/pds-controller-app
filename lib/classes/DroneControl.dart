@@ -28,12 +28,30 @@ class DroneControl{
     this.speed = speed;
   }
 
+  void switchArm(){
+    if(isArmed == false){
+      isArmed = true;
+    }
+    else{
+      isArmed = false;
+    }
+  }
+
   void arm(){
     isArmed = true;
   }
 
   void unArm(){
     isArmed = false;
+  }
+
+  void switchRecording(){
+    if(isRecording == false){
+      isRecording = true;
+    }
+    else{
+      isRecording = false;
+    }
   }
 
   void startRecord(){
@@ -44,5 +62,49 @@ class DroneControl{
     isRecording = false;
   }
 
+  // --- Drone Flying Control ---
 
+  // rotation
+  void resetRotation(){
+    r = 0;
+  }
+
+  void rotateLeft(){
+    r = 1;
+  }
+
+  void rotateRight(){
+    r = -1;
+  }
+
+  // altitude control
+  void resetVertical(){
+    z = 0;
+  }
+
+  void moveUp(){
+    z = 0.5;
+  }
+
+  void moveDown(){
+    z = -0.5;
+  }
+
+  // direction
+
+  void setDirection(double x, double y){
+    this.x = x;
+    this.y = y;
+  }
+
+  void resetDirection(){
+    x = 0;
+    y = 0;
+  }
+
+
+  @override
+  String toString() {
+    return "x: " + x.toString() +" y: " + y.toString() + " z: " + z.toString() + " r: " + r.toString() + " arm: " + isArmed.toString() + " isRec: " + isRecording.toString();
+  }
 }

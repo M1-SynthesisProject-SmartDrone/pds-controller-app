@@ -2,7 +2,8 @@
 enum ResponseTypes {
   ANSWER,
   DRONE_DATA,
-  DRONE_STATE
+  DRONE_STATE,
+  RECORD
 }
 
 extension ResponseTypesValues on ResponseTypes {
@@ -14,6 +15,8 @@ extension ResponseTypesValues on ResponseTypes {
         return "DRONE_DATA";
       case ResponseTypes.DRONE_STATE:
         return "DRONE_STATE";
+      case ResponseTypes.RECORD:
+        return "RECORD";
       default:
         return "";
     }
