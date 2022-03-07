@@ -1,7 +1,9 @@
+import 'package:droneapp/classes/DroneCommunication.dart';
 import 'package:droneapp/widgets/home/connexion.dart';
 import 'package:droneapp/widgets/manual_control/ManualControl.dart';
 import 'package:droneapp/widgets/automatic_control/trajet.dart';
 import 'package:droneapp/widgets/automatic_control/trajetSelection.dart';
+import 'package:droneapp/widgets/util/ToastUtil.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -54,7 +56,9 @@ class NavigationSelection extends StatelessWidget {
                           backgroundColor: MaterialStateProperty.all<Color>(Colors.blue)
                       ),
                       onPressed: () {
-                        Navigator.pop(context);
+                        DroneCommunication().disconnect().then((_) {
+                          Navigator.pop(context);
+                        }).catchError((e) {ToastUtil.showToast(context, "Cannot disconnect: " + e.toString());});
                       },
                       child: const Text('Disconnect'),
                     )

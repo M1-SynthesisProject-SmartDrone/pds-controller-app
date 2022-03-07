@@ -70,6 +70,7 @@ class ActionsButtonsState extends State<ActionsButtons> {
   }
 
   setArmedState(ActionState armState) {
+    log('SET ARMED STATE CALLED');
     setState(() {
       armState = armState;
     });

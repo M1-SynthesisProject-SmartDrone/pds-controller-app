@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:droneapp/classes/CommunicationAPI/requests/ManualControlRequest.dart';
 import 'package:droneapp/classes/DroneControl.dart';
 import 'package:droneapp/widgets/drone_data_display/DroneData.dart';
+import 'package:droneapp/widgets/manual_control/joystick/ActionState.dart';
 import 'package:droneapp/widgets/manual_control/joystick/Joystick.dart';
 import 'package:droneapp/widgets/util/ToastUtil.dart';
 import 'package:flutter/material.dart';
@@ -20,20 +21,35 @@ class ManualControl extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    void _sendManualControl() {
+      Future.delayed(const Duration(milliseconds: 300), () async {
+        await droneCommunication.networkControl
+            .sendRequest(ManualControlRequest(control.x, control.y, control.z, control.r));
+        if (control.isArmed) {
+          _sendManualControl();
+        }
+      });
+    }
+
     void _switchArm() {
       if (control.isArmed) {
         ToastUtil.showToast(context, "Cannot disarm drone (the drone will be disarmed automatically)");
       } else {
+        joystickController.updateArmState(ActionState.WAITING);
         log("Ask to arm the drone");
         droneCommunication.armDrone().then((_) {
           control.arm();
           log("Drone armed (${control.isArmed})");
+          joystickController.updateArmState(ActionState.ENABLED);
+          log("Action state done");
+          _sendManualControl();
           // TODO : launch reception messages
           // TODO : launch timer for sending messages
         }).catchError((e) {
           ToastUtil.showToast(context, "Error while Arming Drone : " + e.toString());
           control.unArm();
           log("control arm -> " + control.isArmed.toString());
+          joystickController.updateArmState(ActionState.DISABLED);
         });
       }
     }
@@ -57,15 +73,6 @@ class ManualControl extends StatelessWidget {
           log("control rec -> " + control.isRecording.toString());
         });
       }
-    }
-
-    void _sendManualControl() {
-      Future.delayed(const Duration(milliseconds: 300), () async {
-        await droneCommunication.networkControl.sendRequest(ManualControlRequest(control.x, control.y, control.z, control.r));
-        if (control.isArmed) {
-          _sendManualControl();
-        }
-      });
     }
 
     return Container(

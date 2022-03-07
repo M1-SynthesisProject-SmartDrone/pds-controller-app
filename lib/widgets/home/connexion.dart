@@ -28,6 +28,7 @@ class Connexion extends StatelessWidget{
             TextField(
               obscureText: false,
               controller: ipText,
+              keyboardType: TextInputType.number,
               decoration: const InputDecoration(
                 border: OutlineInputBorder(),
                 labelText: 'IP address',
@@ -36,6 +37,7 @@ class Connexion extends StatelessWidget{
             TextField(
               obscureText: false,
               controller: portText,
+              keyboardType: TextInputType.number,
               decoration: const InputDecoration(
                 border: OutlineInputBorder(),
                 labelText: 'Port',

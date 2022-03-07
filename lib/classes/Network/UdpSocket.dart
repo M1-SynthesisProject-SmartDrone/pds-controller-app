@@ -20,7 +20,6 @@ class UdpSocket {
   static Future<UdpSocket> bind(int port, {dynamic host, bool reuseAddress = false, bool reusePort = false}) async {
     dynamic hostUsed = host ?? InternetAddress.anyIPv4;
     var socket = await RawDatagramSocket.bind(hostUsed, port, reusePort: reusePort, reuseAddress: reuseAddress);
-
     return UdpSocket._(socket);
   }
 
@@ -47,7 +46,7 @@ class UdpSocket {
     // This Completer permits to use future in callbacks used by RawDatagramSocket
     // (This is the resolve/reject of dart in a nutshell)
     // Completer.sync permits to end the Future on the first completer.complete call (or error)
-    final Completer completer = Completer<Datagram>.sync();
+    final Completer completer = Completer<Datagram>();
 
     if (timeout != null) {
       // If completer is not still called after the end of the timeout, an error will be thrown
@@ -65,8 +64,7 @@ class UdpSocket {
     Future.microtask(() async {
       try {
         while (true) {
-          RawSocketEvent event = await _streamQueue.peek;
-          print(event);
+          RawSocketEvent event = await _streamQueue.next;
           switch (event) {
             case RawSocketEvent.read:
               if (completer.isCompleted) {
@@ -90,7 +88,7 @@ class UdpSocket {
               break;
             default:
               // We don't care about the current event. Wait for the next event to come
-              await _streamQueue.next;
+              // await _streamQueue.next;
           }
         }
       } catch (e) {
@@ -99,6 +97,22 @@ class UdpSocket {
     });
     return completer.future as Future<Datagram>;
   }
+
+  // Future<Datagram> receiveDifferent() async {
+  //   final Completer completer = Completer<Datagram>();
+  //
+  //   datagramSocket.listen((RawSocketEvent event) {
+  //     switch(event) {
+  //       case RawSocketEvent.read:
+  //         var datagram = datagramSocket.receive();
+  //         if (datagram == null) {
+  //           return completer.completeError("Received null datagram");
+  //         }
+  //         completer.complete(datagram);
+  //     }
+  //   });
+  //   return completer.future as Future<Datagram>;
+  // }
 
   /// Close the socket and waits until this socket is closed
   Future<void> closeSocket() async {

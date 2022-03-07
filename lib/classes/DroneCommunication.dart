@@ -53,7 +53,10 @@ class DroneCommunication {
       developer.log("Request : " + request.toJsonString());
 
       networkControl.sendRequest(request);
-      Response response = await networkControl.receiveResponse(timeout: const Duration(seconds: 10));
+      Response response;
+      do {
+        response = await networkControl.receiveResponse(timeout: const Duration(seconds: 10));
+      } while(response.responseType != ResponseTypes.ANSWER);
       if (response.responseType != ResponseTypes.ANSWER) {
         return Future.error("Response type is not \"ANSWER\" but ${response.responseType}");
       }
@@ -129,5 +132,9 @@ class DroneCommunication {
       developer.log("Error while ack", error: e);
       return Future.error(e.toString());
     }
+  }
+
+  Future<void> disconnect() async {
+    await networkControl.close();
   }
 }

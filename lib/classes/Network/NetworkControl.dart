@@ -11,15 +11,13 @@ import '../CommunicationAPI/requests/Request.dart';
 /// This class is a high-level abstraction of the [UdpSocket] class
 class NetworkControl {
   late InternetAddress address;
-  late int port = -1;
+  late int port;
   late UdpSocket udpSocket;
 
   Future<void> bind(String ipAddress, int port) async {
     address = InternetAddress(ipAddress, type: InternetAddressType.any);
-    if (port != this.port) {
-      this.port = port;
-      udpSocket = await UdpSocket.bind(port);
-    }
+    this.port = port;
+    udpSocket = await UdpSocket.bind(port);
   }
 
   Future<int> sendRequest(Request request) async {
