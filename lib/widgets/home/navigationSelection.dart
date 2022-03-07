@@ -3,6 +3,7 @@ import 'package:droneapp/widgets/manual_control/joystick.dart';
 import 'package:droneapp/widgets/automatic_control/trajet.dart';
 import 'package:droneapp/widgets/automatic_control/trajetSelection.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../../main.dart';
 class NavigationSelection extends StatelessWidget {
@@ -10,6 +11,7 @@ class NavigationSelection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
     // Material is a conceptual piece
     // of paper on which the UI appears.
     return MaterialApp(

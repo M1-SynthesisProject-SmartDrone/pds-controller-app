@@ -4,13 +4,14 @@ import 'dart:developer';
 import 'package:control_pad/models/gestures.dart';
 import 'package:control_pad/models/pad_button_item.dart';
 import 'package:droneapp/classes/DroneControl.dart';
+import 'package:droneapp/widgets/drone_data_display/DroneData.dart';
 import 'package:droneapp/widgets/util/ToastUtil.dart';
 import 'package:flutter/material.dart';
 import 'package:control_pad/control_pad.dart';
 import '../../classes/DroneCommunication.dart';
 
 class JoyStick extends StatefulWidget {
-  JoyStick({Key? key}) : super(key: key);
+  const JoyStick({Key? key}) : super(key: key);
 
   @override
   _JoystickState createState() => _JoystickState();
@@ -134,129 +135,104 @@ class _JoystickState extends State {
       log(control.toString());
     }
 
+    Size screenSize = MediaQuery.of(context).size;
+
     // Material is a conceptual piece
     // of paper on which the UI appears.
     return Container(
         // Column is a vertical, linear layout.
         color: Colors.white,
         child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const SizedBox(width: 20), // <-- Set height
-            Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Container(
-                  width: 150,
-                  height: 300,
-                  child: Row(
-                    children: [
-                      const SizedBox(width: 50), // <-- Set height
-
-                      RotatedBox(
-                          quarterTurns: -1,
-                          child: Text(
-                            'Altitude : ' + control.altitude.toString(),
-                            style: const TextStyle(fontSize: 15, color: Colors.black),
-                          )),
-                      RotatedBox(
-                          quarterTurns: -1,
-                          child: Text("Vitesse sol : " + control.speed.toString(),
-                              style: const TextStyle(fontSize: 15, color: Colors.black))),
-                      RotatedBox(
-                          quarterTurns: -1,
-                          child: Text("Position : " + control.position.toString(),
-                              style: const TextStyle(fontSize: 15, color: Colors.black))),
-                    ],
-                  ),
-                  decoration: BoxDecoration(border: Border.all(color: Colors.grey)),
-                ),
-              ],
-            ),
-            Column(
-              children: [
-                const SizedBox(height: 70), // <-- Set height
-                RotatedBox(
-                    quarterTurns: -1,
-                    child: PadButtonsView(
-                      backgroundPadButtonsColor: Colors.grey,
-                      buttonsPadding: 8,
-                      padButtonPressedCallback: droneController,
-                      buttons: const [
-                        PadButtonItem(
-                            index: 0,
-                            buttonIcon: Icon(
-                              Icons.arrow_right,
-                              size: 30,
-                            ),
-                            backgroundColor: Colors.lightBlue,
-                            supportedGestures: [Gestures.TAPDOWN, Gestures.LONGPRESSUP, Gestures.TAPUP]),
-                        PadButtonItem(
-                            index: 1,
-                            buttonIcon: Icon(
-                              Icons.arrow_downward,
-                              size: 30,
-                            ),
-                            backgroundColor: Colors.red,
-                            pressedColor: Colors.redAccent,
-                            supportedGestures: [Gestures.TAPDOWN, Gestures.LONGPRESSUP, Gestures.TAPUP]),
-                        PadButtonItem(
-                            index: 2,
-                            buttonIcon: Icon(
-                              Icons.arrow_left,
-                              size: 30,
-                            ),
-                            backgroundColor: Colors.lightBlue,
-                            supportedGestures: [Gestures.TAPDOWN, Gestures.LONGPRESSUP, Gestures.TAPUP]),
-                        PadButtonItem(
-                            index: 3,
-                            buttonIcon: Icon(
-                              Icons.arrow_upward,
-                              size: 30,
-                            ),
-                            backgroundColor: Colors.green,
-                            pressedColor: Colors.greenAccent,
-                            supportedGestures: [Gestures.TAPDOWN, Gestures.LONGPRESSUP, Gestures.TAPUP])
-                      ],
-                    )),
-                const SizedBox(height: 100),
-                Row(
+            Container(padding: const EdgeInsets.all(20.0), child: DroneData(screenSize: screenSize)),
+            Container(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     RotatedBox(
-                      quarterTurns: -1,
-                      child: TextButton(
-                          onPressed: _switchRecord,
-                          style: ButtonStyle(
-                              foregroundColor: MaterialStateProperty.all<Color>(Colors.white),
-                              backgroundColor: MaterialStateProperty.all<Color>(recordButtonColor)),
-                          child: const Text("Record")),
+                        quarterTurns: -1,
+                        child: PadButtonsView(
+                          backgroundPadButtonsColor: Colors.grey,
+                          buttonsPadding: 8,
+                          padButtonPressedCallback: droneController,
+                          buttons: const [
+                            PadButtonItem(
+                                index: 0,
+                                buttonIcon: Icon(
+                                  Icons.arrow_right,
+                                  size: 30,
+                                ),
+                                backgroundColor: Colors.lightBlue,
+                                supportedGestures: [Gestures.TAPDOWN, Gestures.LONGPRESSUP, Gestures.TAPUP]),
+                            PadButtonItem(
+                                index: 1,
+                                buttonIcon: Icon(
+                                  Icons.arrow_downward,
+                                  size: 30,
+                                ),
+                                backgroundColor: Colors.red,
+                                pressedColor: Colors.redAccent,
+                                supportedGestures: [Gestures.TAPDOWN, Gestures.LONGPRESSUP, Gestures.TAPUP]),
+                            PadButtonItem(
+                                index: 2,
+                                buttonIcon: Icon(
+                                  Icons.arrow_left,
+                                  size: 30,
+                                ),
+                                backgroundColor: Colors.lightBlue,
+                                supportedGestures: [Gestures.TAPDOWN, Gestures.LONGPRESSUP, Gestures.TAPUP]),
+                            PadButtonItem(
+                                index: 3,
+                                buttonIcon: Icon(
+                                  Icons.arrow_upward,
+                                  size: 30,
+                                ),
+                                backgroundColor: Colors.green,
+                                pressedColor: Colors.greenAccent,
+                                supportedGestures: [Gestures.TAPDOWN, Gestures.LONGPRESSUP, Gestures.TAPUP])
+                          ],
+                        )),
+                    const SizedBox(height: 50),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        RotatedBox(
+                          quarterTurns: -1,
+                          child: TextButton(
+                              onPressed: _switchRecord,
+                              style: ButtonStyle(
+                                  foregroundColor: MaterialStateProperty.all<Color>(Colors.white),
+                                  backgroundColor: MaterialStateProperty.all<Color>(recordButtonColor)),
+                              child: const Text("Record")),
+                        ),
+                        RotatedBox(
+                            quarterTurns: -1,
+                            child: TextButton(
+                                onPressed: _switchArm,
+                                style: ButtonStyle(
+                                    foregroundColor: MaterialStateProperty.all<Color>(Colors.white),
+                                    backgroundColor: MaterialStateProperty.all<Color>(armButtonColor)),
+                                child: const Text("Arm"))),
+                        RotatedBox(
+                            quarterTurns: -1,
+                            child: TextButton(
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                },
+                                child: const Icon(Icons.arrow_back_sharp))),
+                      ],
                     ),
+                    const SizedBox(height: 50),
                     RotatedBox(
                         quarterTurns: -1,
-                        child: TextButton(
-                            onPressed: _switchArm,
-                            style: ButtonStyle(
-                                foregroundColor: MaterialStateProperty.all<Color>(Colors.white),
-                                backgroundColor: MaterialStateProperty.all<Color>(armButtonColor)),
-                            child: const Text("Arm"))),
-                    RotatedBox(
-                        quarterTurns: -1,
-                        child: TextButton(
-                            onPressed: () {
-                              Navigator.pop(context);
-                            },
-                            child: const Icon(Icons.arrow_back_sharp))),
+                        child: JoystickView(
+                          onDirectionChanged: droneDirection,
+                          interval: const Duration(milliseconds: 100),
+                        )),
                   ],
-                ), // <-- Set height
-                const SizedBox(height: 100), // <-- Set height
-                RotatedBox(
-                    quarterTurns: -1,
-                    child: JoystickView(
-                      onDirectionChanged: droneDirection,
-                      interval: const Duration(milliseconds: 100),
-                    )),
-              ],
-            )
+                ))
           ],
         ));
   }
