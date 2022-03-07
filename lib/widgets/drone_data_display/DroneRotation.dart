@@ -8,7 +8,7 @@ class DroneRotation extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Text("Rotation : $rotation°",
+    return Text("Rotation: $rotation°",
         style: const TextStyle(fontSize: 15, color: Colors.black));
   }
 }

@@ -1,4 +1,4 @@
-class DroneControl{
+class DroneControl {
   // --- Variables ---
   double x = 0;
   double y = 0;
@@ -8,103 +8,101 @@ class DroneControl{
   bool isArmed = false;
   bool isRecording = false;
 
-  double altitude = 0;
-  double speed = 0;
-  double position = 0;
-
-
   static final DroneControl _droneControl = DroneControl._internal();
+
   // --- Methods ---
 
-  factory DroneControl(){
+  factory DroneControl() {
     return _droneControl;
   }
 
   DroneControl._internal();
 
-  void updateData(double position, double altitude, double speed){
-    this.position = position;
-    this.altitude = altitude;
-    this.speed = speed;
-  }
-
-  void switchArm(){
-    if(isArmed == false){
+  void switchArm() {
+    if (isArmed == false) {
       isArmed = true;
-    }
-    else{
+    } else {
       isArmed = false;
     }
   }
 
-  void arm(){
+  void arm() {
     isArmed = true;
   }
 
-  void unArm(){
+  void unArm() {
     isArmed = false;
   }
 
-  void switchRecording(){
-    if(isRecording == false){
+  void switchRecording() {
+    if (isRecording == false) {
       isRecording = true;
-    }
-    else{
+    } else {
       isRecording = false;
     }
   }
 
-  void startRecord(){
+  void startRecord() {
     isRecording = true;
   }
 
-  void endRecord(){
+  void endRecord() {
     isRecording = false;
   }
 
   // --- Drone Flying Control ---
 
   // rotation
-  void resetRotation(){
+  void resetRotation() {
     r = 0;
   }
 
-  void rotateLeft(){
+  void rotateLeft() {
     r = 1;
   }
 
-  void rotateRight(){
+  void rotateRight() {
     r = -1;
   }
 
   // altitude control
-  void resetVertical(){
+  void resetVertical() {
     z = 0;
   }
 
-  void moveUp(){
+  void moveUp() {
     z = 0.5;
   }
 
-  void moveDown(){
+  void moveDown() {
     z = -0.5;
   }
 
   // direction
 
-  void setDirection(double x, double y){
+  void setDirection(double x, double y) {
     this.x = x;
     this.y = y;
   }
 
-  void resetDirection(){
+  void resetDirection() {
     x = 0;
     y = 0;
   }
 
-
   @override
   String toString() {
-    return "x: " + x.toString() +" y: " + y.toString() + " z: " + z.toString() + " r: " + r.toString() + " arm: " + isArmed.toString() + " isRec: " + isRecording.toString();
+    return "x: " +
+        x.toString() +
+        " y: " +
+        y.toString() +
+        " z: " +
+        z.toString() +
+        " r: " +
+        r.toString() +
+        " arm: " +
+        isArmed.toString() +
+        " isRec: " +
+        isRecording.toString();
   }
 }

@@ -8,7 +8,7 @@ class DroneBattery extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Text("Remaining battery : $remainingBattery %",
+    return Text("Remaining battery: $remainingBattery %",
         style: const TextStyle(fontSize: 15, color: Colors.black));
   }
 }

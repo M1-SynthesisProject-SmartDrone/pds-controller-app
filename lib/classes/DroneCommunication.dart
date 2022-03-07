@@ -55,7 +55,7 @@ class DroneCommunication {
       networkControl.sendRequest(request);
       Response response = await networkControl.receiveResponse(timeout: const Duration(seconds: 10));
       if (response.responseType != ResponseTypes.ANSWER) {
-        return Future.error("error");
+        return Future.error("Response type is not \"ANSWER\" but ${response.responseType}");
       }
       AnswerResponse answer = response as AnswerResponse;
       if (!answer.validated) {

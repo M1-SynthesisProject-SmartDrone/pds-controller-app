@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
 class DroneSpeed extends StatelessWidget {
-  final double vx;
-  final double vy;
-  final double vz;
+  final int vx;
+  final int vy;
+  final int vz;
 
   const DroneSpeed({Key? key, required this.vx, required this.vy, required this.vz})
       : super(key: key);

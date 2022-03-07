@@ -1,5 +1,5 @@
 import 'package:droneapp/widgets/home/connexion.dart';
-import 'package:droneapp/widgets/manual_control/joystick.dart';
+import 'package:droneapp/widgets/manual_control/ManualControl.dart';
 import 'package:droneapp/widgets/automatic_control/trajet.dart';
 import 'package:droneapp/widgets/automatic_control/trajetSelection.dart';
 import 'package:flutter/material.dart';
@@ -33,7 +33,7 @@ class NavigationSelection extends StatelessWidget {
                           backgroundColor: MaterialStateProperty.all<Color>(Colors.blue)
                       ),
                       onPressed: () {
-                        Navigator.push(context, MaterialPageRoute(builder: (context) => JoyStick()));
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => ManualControl()));
                       },
                       child: const Text('Manual control'),
                     ),

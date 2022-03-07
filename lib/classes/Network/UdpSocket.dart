@@ -66,6 +66,7 @@ class UdpSocket {
       try {
         while (true) {
           RawSocketEvent event = await _streamQueue.peek;
+          print(event);
           switch (event) {
             case RawSocketEvent.read:
               if (completer.isCompleted) {
