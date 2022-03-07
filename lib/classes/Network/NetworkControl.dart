@@ -6,19 +6,17 @@ import 'package:droneapp/classes/CommunicationAPI/responses/Response.dart';
 import 'package:droneapp/classes/CommunicationAPI/responses/ResponseConverter.dart';
 import 'package:droneapp/classes/Network/UdpSocket.dart';
 
-import 'CommunicationAPI/requests/Request.dart';
+import '../CommunicationAPI/requests/Request.dart';
 
+/// This class is a high-level abstraction of the [UdpSocket] class
 class NetworkControl {
-  final InternetAddress address;
-  final int port;
-
+  late InternetAddress address;
+  late int port;
   late UdpSocket udpSocket;
 
-  NetworkControl(String ipAddress, this.port) : address = InternetAddress(ipAddress, type: InternetAddressType.any) {
-    developer.log(address.toString() + " " + port.toString(), name: "network.control");
-  }
-
-  Future<void> connect() async {
+  Future<void> bind(String ipAddress, int port) async {
+    address = InternetAddress(ipAddress, type: InternetAddressType.any);
+    this.port = port;
     udpSocket = await UdpSocket.bind(port);
   }
 

@@ -1,9 +1,9 @@
-import 'package:droneapp/widgets/TrajetArguments.dart';
-import 'package:droneapp/widgets/connexion.dart';
-import 'package:droneapp/widgets/trajet.dart';
+import 'package:droneapp/widgets/automatic_control/TrajetArguments.dart';
+import 'package:droneapp/widgets/home/connexion.dart';
+import 'package:droneapp/widgets/automatic_control/trajet.dart';
 import 'package:flutter/material.dart';
 
-import '../main.dart';
+import '../../main.dart';
 
 class TrajetList extends StatelessWidget {
   const TrajetList({Key? key}) : super(key: key);

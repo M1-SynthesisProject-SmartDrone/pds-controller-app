@@ -4,14 +4,15 @@ import 'dart:developer' as developer;
 
 import 'package:async/async.dart';
 
-/// A wrapper class to handle RawDatagramSocket more easily
+/// A wrapper class to handle RawDatagramSocket more easily.
 class UdpSocket {
   final RawDatagramSocket datagramSocket;
 
   /// A view on events passing by RawDatagramSocket
   final StreamQueue _streamQueue;
 
-  UdpSocket(this.datagramSocket) : _streamQueue = StreamQueue(datagramSocket) {}
+  /// Private constructor
+  UdpSocket._(this.datagramSocket) : _streamQueue = StreamQueue(datagramSocket);
 
   /// Bind a socket on a specific port
   ///
@@ -20,7 +21,7 @@ class UdpSocket {
     dynamic hostUsed = host ?? InternetAddress.anyIPv4;
     var socket = await RawDatagramSocket.bind(hostUsed, port, reusePort: reusePort, reuseAddress: reuseAddress);
 
-    return UdpSocket(socket);
+    return UdpSocket._(socket);
   }
 
   /// Send data from a specific port.

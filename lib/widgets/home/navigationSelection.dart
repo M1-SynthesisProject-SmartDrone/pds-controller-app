@@ -1,10 +1,10 @@
-import 'package:droneapp/widgets/connexion.dart';
-import 'package:droneapp/widgets/joystick.dart';
-import 'package:droneapp/widgets/trajet.dart';
-import 'package:droneapp/widgets/trajetSelection.dart';
+import 'package:droneapp/widgets/home/connexion.dart';
+import 'package:droneapp/widgets/manual_control/joystick.dart';
+import 'package:droneapp/widgets/automatic_control/trajet.dart';
+import 'package:droneapp/widgets/automatic_control/trajetSelection.dart';
 import 'package:flutter/material.dart';
 
-import '../main.dart';
+import '../../main.dart';
 class NavigationSelection extends StatelessWidget {
   const NavigationSelection({Key? key}) : super(key: key);
 
@@ -15,7 +15,7 @@ class NavigationSelection extends StatelessWidget {
     return MaterialApp(
       // Column is a vertical, linear layout.
       home: Scaffold(
-        appBar : AppBar(title: Text('Drone Controller')),
+        appBar : AppBar(title: const Text('Drone Controller')),
         body: Column(
           mainAxisAlignment: MainAxisAlignment.center,
 
@@ -33,7 +33,7 @@ class NavigationSelection extends StatelessWidget {
                       onPressed: () {
                         Navigator.push(context, MaterialPageRoute(builder: (context) => JoyStick()));
                       },
-                      child: Text('Controle manuel'),
+                      child: const Text('Manual control'),
                     ),
                     TextButton(
                       style: ButtonStyle(
@@ -44,7 +44,7 @@ class NavigationSelection extends StatelessWidget {
                         Navigator.push(context, MaterialPageRoute(builder: (context) => const TrajetList()));
 
                       },
-                      child: Text('Controle automatique'),
+                      child: const Text('Automatic control'),
                     ),
                     TextButton(
                       style: ButtonStyle(
@@ -54,7 +54,7 @@ class NavigationSelection extends StatelessWidget {
                       onPressed: () {
                         Navigator.pop(context);
                       },
-                      child: Text('Deconnexion'),
+                      child: const Text('Disconnect'),
                     )
 
 

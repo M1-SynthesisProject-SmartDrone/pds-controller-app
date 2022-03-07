@@ -1,10 +1,10 @@
-import 'package:droneapp/classes/NetworkControl.dart';
-import 'package:droneapp/widgets/navigationSelection.dart';
+import 'package:droneapp/classes/Network/NetworkControl.dart';
+import 'package:droneapp/widgets/home/navigationSelection.dart';
 import 'package:droneapp/widgets/util/ToastUtil.dart';
 import 'package:flutter/material.dart';
 import 'dart:developer' as developer;
 
-import '../classes/DroneCommunication.dart';
+import '../../classes/DroneCommunication.dart';
 
 class Connexion extends StatelessWidget{
 

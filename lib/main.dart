@@ -1,9 +1,9 @@
-import 'package:droneapp/widgets/connexion.dart';
+import 'package:droneapp/widgets/home/connexion.dart';
 import 'package:flutter/material.dart';
 
 
-class Connection extends StatelessWidget {
-  const Connection({Key? key}) : super(key: key);
+class Home extends StatelessWidget {
+  const Home({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +31,7 @@ class Connection extends StatelessWidget {
 void main() {
   runApp(
     const Material(
-      child: Connection(),
+      child: Home(),
     ),
   );
 }

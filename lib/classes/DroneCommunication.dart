@@ -7,34 +7,31 @@ import 'package:droneapp/classes/CommunicationAPI/requests/StartDroneRequest.dar
 import 'package:droneapp/classes/CommunicationAPI/responses/AnswerResponse.dart';
 import 'package:droneapp/classes/CommunicationAPI/responses/Response.dart';
 import 'package:droneapp/classes/CommunicationAPI/responses/ResponseTypes.dart';
-import 'package:droneapp/classes/NetworkControl.dart';
+import 'package:droneapp/classes/Network/NetworkControl.dart';
 
 class DroneCommunication {
   late NetworkControl networkControl;
-  late String address;
-  late String port;
 
   static final DroneCommunication _droneCommunication = DroneCommunication._internal();
 
-  factory DroneCommunication(){
+  factory DroneCommunication() {
     return _droneCommunication;
   }
 
-  DroneCommunication._internal();
+  DroneCommunication._internal() {
+    networkControl = NetworkControl();
+  }
 
   /// Send a acknowledgement message to the server and waits for the response
   /// Does not return anything, but can throw errors if connection is not well made
   Future<void> connect(String address, String port) async {
-    networkControl = NetworkControl(address, int.parse(port));
-    await networkControl.connect();
+    await networkControl.bind(address, int.parse(port));
     try {
       Request request = AckRequest();
       developer.log("Request : " + request.toJsonString());
 
       networkControl.sendRequest(request);
       Response response = await networkControl.receiveResponse(timeout: const Duration(seconds: 10));
-      this.address = address;
-      this.port = port;
       if (response.responseType != ResponseTypes.ANSWER) {
         return Future.error("error");
       }
@@ -45,25 +42,18 @@ class DroneCommunication {
       }
     } catch (e) {
       developer.log("Error while ack", error: e);
-      return Future.error(e.toString());
-    } finally {
       networkControl.close();
+      return Future.error(e.toString());
     }
   }
 
-
-
-  Future<void> armDrone() async{
-    networkControl = NetworkControl(address, int.parse(port));
-    await networkControl.connect();
+  Future<void> armDrone() async {
     try {
       Request request = StartDroneRequest(true);
       developer.log("Request : " + request.toJsonString());
 
       networkControl.sendRequest(request);
       Response response = await networkControl.receiveResponse(timeout: const Duration(seconds: 10));
-      this.address = address;
-      this.port = port;
       if (response.responseType != ResponseTypes.ANSWER) {
         return Future.error("error");
       }
@@ -75,22 +65,16 @@ class DroneCommunication {
     } catch (e) {
       developer.log("Error while ack", error: e);
       return Future.error(e.toString());
-    } finally {
-      networkControl.close();
     }
   }
 
-  Future<void> disarmDrone() async{
-    networkControl = NetworkControl(address, int.parse(port));
-    await networkControl.connect();
+  Future<void> disarmDrone() async {
     try {
       Request request = StartDroneRequest(false);
       developer.log("Request : " + request.toJsonString());
 
       networkControl.sendRequest(request);
       Response response = await networkControl.receiveResponse(timeout: const Duration(seconds: 10));
-      this.address = address;
-      this.port = port;
       if (response.responseType != ResponseTypes.ANSWER) {
         return Future.error("error");
       }
@@ -102,23 +86,16 @@ class DroneCommunication {
     } catch (e) {
       developer.log("Error while ack", error: e);
       return Future.error(e.toString());
-    } finally {
-      networkControl.close();
     }
   }
 
-
-  Future<void> startRecording() async{
-    networkControl = NetworkControl(address, int.parse(port));
-    await networkControl.connect();
+  Future<void> startRecording() async {
     try {
       Request request = RecordRequest(true);
       developer.log("Request : " + request.toJsonString());
 
       networkControl.sendRequest(request);
       Response response = await networkControl.receiveResponse(timeout: const Duration(seconds: 10));
-      this.address = address;
-      this.port = port;
       if (response.responseType != ResponseTypes.ANSWER) {
         return Future.error("error");
       }
@@ -130,22 +107,16 @@ class DroneCommunication {
     } catch (e) {
       developer.log("Error while ack", error: e);
       return Future.error(e.toString());
-    } finally {
-      networkControl.close();
     }
   }
 
-  Future<void> endRecording() async{
-    networkControl = NetworkControl(address, int.parse(port));
-    await networkControl.connect();
+  Future<void> endRecording() async {
     try {
       Request request = RecordRequest(false);
       developer.log("Request : " + request.toJsonString());
 
       networkControl.sendRequest(request);
       Response response = await networkControl.receiveResponse(timeout: const Duration(seconds: 10));
-      this.address = address;
-      this.port = port;
       if (response.responseType != ResponseTypes.ANSWER) {
         return Future.error("error");
       }
@@ -157,8 +128,6 @@ class DroneCommunication {
     } catch (e) {
       developer.log("Error while ack", error: e);
       return Future.error(e.toString());
-    } finally {
-      networkControl.close();
     }
   }
 }
