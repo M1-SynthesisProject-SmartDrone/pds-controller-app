@@ -5,6 +5,8 @@ import 'dart:ui';
 import 'package:control_pad/models/gestures.dart';
 import 'package:control_pad/models/pad_button_item.dart';
 import 'package:droneapp/classes/DroneControl.dart';
+import 'package:droneapp/classes/Network/DroneControlSender.dart';
+import 'package:droneapp/classes/Network/DroneDataReceiver.dart';
 import 'package:droneapp/widgets/connexion.dart';
 import 'package:droneapp/widgets/util/ToastUtil.dart';
 import 'package:flutter/material.dart';
@@ -24,14 +26,25 @@ class JoyStick extends StatefulWidget {
 
 
 class _JoystickState extends State{
-  final DroneCommunication droneCommunication= DroneCommunication();
+
+
+  DroneCommunication droneCommunication= DroneCommunication();
   DroneControl control = DroneControl();
   double PI = 3.141592653589793238;
+  DroneControlSender sender = DroneControlSender();
+  DroneDataReceiver receiver = DroneDataReceiver();
 
 
   Color armButtonColor = Colors.red;
   Color recordButtonColor = Colors.red;
 
+
+  @override
+  void initState() {
+    super.initState();
+    sender.sendDroneControl();
+    //receiver.updateDroneData();
+  }
 
   void _switchArm(){
     setState(() {
@@ -113,7 +126,6 @@ class _JoystickState extends State{
 
   @override
   Widget build(BuildContext context) {
-
     void droneDirection(
         double degrees, double distance){
       // print(degrees.toString() + " --- "+distance.toString() );

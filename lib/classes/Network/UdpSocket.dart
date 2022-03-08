@@ -13,13 +13,13 @@ class UdpSocket {
 
   UdpSocket(this.datagramSocket) : _streamQueue = StreamQueue(datagramSocket) {}
 
+
   /// Bind a socket on a specific port
   ///
   /// If "host" is not defined, InternetAddress.anyIPv4 will be used
   static Future<UdpSocket> bind(int port, {dynamic host, bool reuseAddress = false, bool reusePort = false}) async {
     dynamic hostUsed = host ?? InternetAddress.anyIPv4;
     var socket = await RawDatagramSocket.bind(hostUsed, port, reusePort: reusePort, reuseAddress: reuseAddress);
-
     return UdpSocket(socket);
   }
 

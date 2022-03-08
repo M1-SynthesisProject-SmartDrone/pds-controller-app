@@ -11,14 +11,15 @@ import 'CommunicationAPI/requests/Request.dart';
 class NetworkControl {
   final InternetAddress address;
   final int port;
-
   late UdpSocket udpSocket;
+
 
   NetworkControl(String ipAddress, this.port) : address = InternetAddress(ipAddress, type: InternetAddressType.any) {
     developer.log(address.toString() + " " + port.toString(), name: "network.control");
   }
 
   Future<void> connect() async {
+
     udpSocket = await UdpSocket.bind(port);
   }
 

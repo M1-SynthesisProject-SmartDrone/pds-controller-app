@@ -5,6 +5,8 @@ import 'package:droneapp/classes/CommunicationAPI/responses/AnswerResponse.dart'
 import 'package:droneapp/classes/CommunicationAPI/responses/Response.dart';
 import 'package:droneapp/classes/CommunicationAPI/responses/ResponseTypes.dart';
 
+import 'DroneData.dart';
+
 /// Util class used to convert a json to a Response implementation
 class ResponseConverter {
 
@@ -28,9 +30,9 @@ class ResponseConverter {
       case ResponseTypes.ANSWER:
          return answerFromContent(content);
       case ResponseTypes.DRONE_STATE:
-        // TODO implement this converter
+      // TODO implement this converter
       case ResponseTypes.DRONE_DATA:
-        // TODO implement this converter
+        return droneDataFromContent(content);
       default:
         throw UnimplementedError("Type $typeStr does not have a converter for now");
     }
@@ -42,4 +44,17 @@ AnswerResponse answerFromContent(Map<String, dynamic> content) {
   String message = content["message"];
   bool validated = content["validated"];
   return AnswerResponse(name, validated, message);
+}
+
+DroneData droneDataFromContent(Map<String, dynamic> content){
+  int batteryRemaining = content["batteryRemaining"];
+  double lat = content["batteryRemaining"];
+  double lon = content["batteryRemaining"];
+  int alt = content["batteryRemaining"];
+  int relativeAlt = content["batteryRemaining"];
+  int vx = content["batteryRemaining"];
+  int vy = content["batteryRemaining"];
+  int vz = content["batteryRemaining"];
+  int yawRotation = content["batteryRemaining"];
+  return DroneData(batteryRemaining, lat, lon, alt, relativeAlt, vx, vy, vz, yawRotation);
 }

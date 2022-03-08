@@ -2,7 +2,8 @@ enum RequestTypes {
   ACK,
   START_DRONE,
   MANUAL_CONTROL,
-  RECORD
+  RECORD,
+  DRONE_DATA
 }
 
 // Cannot infer values directly, that's a bit sad
@@ -17,6 +18,8 @@ extension RequestTypeValue on RequestTypes {
         return "MANUAL_CONTROL";
       case RequestTypes.RECORD:
         return "RECORD";
+      case RequestTypes.DRONE_DATA:
+        return "DRONE_DATA";
       default:
         return "";
     }
