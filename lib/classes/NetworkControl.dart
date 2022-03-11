@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:developer' as developer;
@@ -7,19 +8,54 @@ import 'package:droneapp/classes/CommunicationAPI/responses/ResponseConverter.da
 import 'package:droneapp/classes/Network/UdpSocket.dart';
 
 import 'CommunicationAPI/requests/Request.dart';
+import 'CommunicationAPI/responses/ResponseTypes.dart';
+import 'DroneCommunication.dart';
+import 'DroneControl.dart';
 
 class NetworkControl {
-  final InternetAddress address;
-  final int port;
+  late InternetAddress address;
+  late int port;
   late UdpSocket udpSocket;
+  late DroneControl control;
+  late DroneCommunication communication;
 
+  static final NetworkControl _networkControl = NetworkControl._internal();
 
-  NetworkControl(String ipAddress, this.port) : address = InternetAddress(ipAddress, type: InternetAddressType.any) {
+  factory NetworkControl(){
+    return _networkControl;
+  }
+
+  NetworkControl._internal();
+
+  Future<void> updateDroneData() async {
+    // while(true){
+    //   await communication.updateDroneData();
+    //
+    // }
+    control = DroneControl();
+    communication = DroneCommunication();
+    Timer.periodic(const Duration(milliseconds: 200), (timer) async {
+      //print("control := " + control.isArmed.toString());
+      if(control.isArmed){
+        await communication.updateDroneData();
+        print("test");
+      }
+
+    });
+  }
+
+  void initConnection(String ipAddress, int port) {
+    address = InternetAddress(ipAddress, type: InternetAddressType.any);
+    this.port = port;
     developer.log(address.toString() + " " + port.toString(), name: "network.control");
   }
 
-  Future<void> connect() async {
 
+/*  NetworkControl(String ipAddress, this.port) : address = InternetAddress(ipAddress, type: InternetAddressType.any) {
+    developer.log(address.toString() + " " + port.toString(), name: "network.control");
+  }*/
+
+  Future<void> connect() async {
     udpSocket = await UdpSocket.bind(port);
   }
 
@@ -30,8 +66,10 @@ class NetworkControl {
   }
 
   Future<Response> receiveResponse({Duration? timeout}) async {
+
     Datagram datagram = await udpSocket.receive(timeout: timeout);
-    Response response = ResponseConverter.convertString(String.fromCharCodes(datagram.data));
+    Response response = ResponseConverter.convertString(
+        String.fromCharCodes(datagram.data));
     return Future.value(response);
   }
 

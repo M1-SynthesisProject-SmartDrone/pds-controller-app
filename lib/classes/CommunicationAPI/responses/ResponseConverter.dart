@@ -31,8 +31,8 @@ class ResponseConverter {
          return answerFromContent(content);
       case ResponseTypes.DRONE_STATE:
       // TODO implement this converter
-      case ResponseTypes.DRONE_DATA:
-        return droneDataFromContent(content);
+     case ResponseTypes.DRONE_DATA:
+       return droneDataFromContent(content);
       default:
         throw UnimplementedError("Type $typeStr does not have a converter for now");
     }
@@ -48,13 +48,13 @@ AnswerResponse answerFromContent(Map<String, dynamic> content) {
 
 DroneData droneDataFromContent(Map<String, dynamic> content){
   int batteryRemaining = content["batteryRemaining"];
-  double lat = content["batteryRemaining"];
-  double lon = content["batteryRemaining"];
+  int lat = content["batteryRemaining"];
+  int lon = content["batteryRemaining"];
   int alt = content["batteryRemaining"];
   int relativeAlt = content["batteryRemaining"];
   int vx = content["batteryRemaining"];
   int vy = content["batteryRemaining"];
   int vz = content["batteryRemaining"];
   int yawRotation = content["batteryRemaining"];
-  return DroneData(batteryRemaining, lat, lon, alt, relativeAlt, vx, vy, vz, yawRotation);
+  return DroneData(batteryRemaining, lat.toDouble(), lon.toDouble(), alt, relativeAlt, vx, vy, vz, yawRotation);
 }

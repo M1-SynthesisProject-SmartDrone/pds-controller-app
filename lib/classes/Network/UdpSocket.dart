@@ -13,13 +13,13 @@ class UdpSocket {
 
   UdpSocket(this.datagramSocket) : _streamQueue = StreamQueue(datagramSocket) {}
 
-
   /// Bind a socket on a specific port
   ///
   /// If "host" is not defined, InternetAddress.anyIPv4 will be used
   static Future<UdpSocket> bind(int port, {dynamic host, bool reuseAddress = false, bool reusePort = false}) async {
     dynamic hostUsed = host ?? InternetAddress.anyIPv4;
     var socket = await RawDatagramSocket.bind(hostUsed, port, reusePort: reusePort, reuseAddress: reuseAddress);
+
     return UdpSocket(socket);
   }
 
@@ -73,13 +73,14 @@ class UdpSocket {
                 // We actually received the message, yeah !
                 var datagram = datagramSocket.receive();
                 if (datagram == null) {
+                  continue;
                   completer.completeError("Received null datagram");
                 }
                 completer.complete(datagram);
               }
               break;
             case RawSocketEvent.closed:
-              // This should not happen, but it is always good to plan ahead
+            // This should not happen, but it is always good to plan ahead
               if (completer.isCompleted) {
                 return;
               } else {
@@ -87,7 +88,7 @@ class UdpSocket {
               }
               break;
             default:
-              // We don't care about the current event. Wait for the next event to come
+            // We don't care about the current event. Wait for the next event to come
               await _streamQueue.next;
           }
         }

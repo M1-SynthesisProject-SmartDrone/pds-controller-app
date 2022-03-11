@@ -21,9 +21,8 @@ class DroneDataReceiver {
 
     Timer.periodic(const Duration(milliseconds: 200), (timer) async {
       //print("control := " + control.isArmed.toString());
-      communication.connect(communication.address, communication.port);
       if(control.isArmed){
-          //await communication.updateDroneData();
+          await communication.updateDroneData();
           print("test");
       }
 

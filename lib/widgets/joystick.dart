@@ -44,12 +44,13 @@ class _JoystickState extends State{
     super.initState();
     sender.sendDroneControl();
     //receiver.updateDroneData();
+    droneCommunication.updateDroneData();
   }
 
   void _switchArm(){
     setState(() {
-      control.switchArm();
-      if (control.isArmed == true) {
+      //control.switchArm();
+      if (control.isArmed == false) {
         armButtonColor = Colors.blue;
         droneCommunication.armDrone()
             .then((void _) {
@@ -70,6 +71,7 @@ class _JoystickState extends State{
         droneCommunication.disarmDrone()
             .then((void _) {
           armButtonColor = Colors.red;
+          control.unArm();
           print("control arm -> " + control.isArmed.toString());
           (context as Element).reassemble();
         })
@@ -220,7 +222,7 @@ class _JoystickState extends State{
                   backgroundPadButtonsColor: Colors.grey,
                   buttonsPadding: 8,
                   padButtonPressedCallback: droneController,
-                  buttons: [
+                  buttons: const [
                     PadButtonItem(
                         index: 0,
                         buttonIcon: Icon(Icons.arrow_right, size: 30,),

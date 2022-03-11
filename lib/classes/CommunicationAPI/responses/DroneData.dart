@@ -18,7 +18,6 @@ class DroneData extends Response{
   DroneData(this.batteryRemaining, this.lat, this.lon, this.alt,
       this.relativeAlt, this.vx, this.vy, this.vz, this.yawRotation) : super(ResponseTypes.DRONE_DATA);
 
-  @override
   Map<String, dynamic> contentToJson() {
     return {
       "batteryRemaining": batteryRemaining,
