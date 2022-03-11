@@ -13,7 +13,6 @@ class Home extends StatelessWidget {
       // Column is a vertical, linear layout.
       home: Scaffold(
         appBar: AppBar(title: const Text("Drone Controller"),),
-
         body: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
