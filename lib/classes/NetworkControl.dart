@@ -34,14 +34,14 @@ class NetworkControl {
     // }
     control = DroneControl();
     communication = DroneCommunication();
-    Timer.periodic(const Duration(milliseconds: 200), (timer) async {
-      //print("control := " + control.isArmed.toString());
-      if(control.isArmed){
-        await communication.updateDroneData();
-        print("test");
-      }
-
-    });
+    // Timer.periodic(const Duration(milliseconds: 200), (timer) async {
+    //   //print("control := " + control.isArmed.toString());
+    //   if(control.isArmed){
+    //     await communication.updateDroneData();
+    //     print("test");
+    //   }
+    //
+    // });
   }
 
   void initConnection(String ipAddress, int port) {

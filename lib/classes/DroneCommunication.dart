@@ -3,9 +3,11 @@ import 'dart:developer' as developer;
 import 'dart:io';
 
 import 'package:droneapp/classes/CommunicationAPI/requests/AckRequest.dart';
+import 'package:droneapp/classes/CommunicationAPI/requests/DroneInfoRequest.dart';
 import 'package:droneapp/classes/CommunicationAPI/requests/RecordRequest.dart';
 import 'package:droneapp/classes/CommunicationAPI/requests/Request.dart';
 import 'package:droneapp/classes/CommunicationAPI/requests/StartDroneRequest.dart';
+import 'package:droneapp/classes/CommunicationAPI/responses/AckAnswer.dart';
 import 'package:droneapp/classes/CommunicationAPI/responses/AnswerResponse.dart';
 import 'package:droneapp/classes/CommunicationAPI/responses/Response.dart';
 import 'package:droneapp/classes/CommunicationAPI/responses/ResponseTypes.dart';
@@ -21,8 +23,8 @@ class DroneCommunication {
   late String port;
   late DroneControl control;
 
-  late bool waitingArm;
-  late bool waitingRec;
+  /*late bool waitingArm;
+  late bool waitingRec;*/
 
   static final DroneCommunication _droneCommunication = DroneCommunication._internal();
 
@@ -46,7 +48,87 @@ class DroneCommunication {
       Response response = await networkControl.receiveResponse(timeout: const Duration(seconds: 10));
       this.address = address;
       this.port = port;
-      if (response.responseType != ResponseTypes.ANSWER) {
+      if (response.responseType != ResponseTypes.ACK) {
+        return Future.error("error");
+      }
+      AckAnswer answer = response as AckAnswer;
+      if (!answer.validated) {
+        // Should never happen
+        return Future.error("Server does not validate the acknowledgement");
+      }
+    } catch (e) {
+      developer.log("Error while ack", error: e);
+      return Future.error(e.toString());
+    }
+  }
+
+  Future<void>  armDrone() async{
+/*    networkControl = NetworkControl(address, int.parse(port));
+    await networkControl.connect();*/
+    try {
+    Request request = StartDroneRequest(true);
+    developer.log("Request : " + request.toJsonString());
+
+    networkControl.sendRequest(request);
+    // waitingArm = true;
+
+      Response response = await networkControl.receiveResponse(timeout: const Duration(seconds: 10));
+      if (response.responseType != ResponseTypes.START_DRONE) {
+        return Future.error("error");
+      }
+      AnswerResponse answer = response as AnswerResponse;
+      if (!answer.validated) {
+        // Should never happen
+        return Future.error("Server does not validate the acknowledgement");
+      }
+    } catch (e, s) {
+      developer.log("Error while ack", error: e);
+      print("Error in armDrone" + s.toString() );
+      return Future.error(e.toString());
+    } /*finally {
+      networkControl.close();
+    }*/
+  }
+
+  Future<void> disarmDrone() async{
+    try {
+    Request request = StartDroneRequest(false);
+    developer.log("Request : " + request.toJsonString());
+
+    networkControl.sendRequest(request);
+    // waitingArm = true;
+
+
+    // if (waitingArm) {
+    //   await Future.doWhile(() => Future.delayed(const Duration(milliseconds: 100)).then((_) => !waitingArm));
+    // }
+      Response response = await networkControl.receiveResponse(timeout: const Duration(seconds: 10));
+
+      if (response.responseType != ResponseTypes.START_DRONE) {
+        return Future.error("error");
+      }
+      AnswerResponse answer = response as AnswerResponse;
+      if (!answer.validated) {
+        // Should never happen
+        return Future.error("Server does not validate the acknowledgement");
+      }
+    } catch (e, s) {
+      developer.log("Error while ack", error: e);
+      developer.log("Error in disarmDrone", error: s );
+
+      return Future.error(e.toString());
+    }
+  }
+
+  Future<void> startRecording() async{
+    try {
+    Request request = RecordRequest(true);
+    developer.log("Request : " + request.toJsonString());
+
+    networkControl.sendRequest(request);
+    // waitingRec = true;
+      Response response = await networkControl.receiveResponse(timeout: const Duration(seconds: 10));
+      if (response.responseType != ResponseTypes.RECORD) {
         return Future.error("error");
       }
       AnswerResponse answer = response as AnswerResponse;
@@ -60,109 +142,27 @@ class DroneCommunication {
     }
   }
 
-  Future<void> armDrone() async{
-/*    networkControl = NetworkControl(address, int.parse(port));
-    await networkControl.connect();*/
-    // try {
-    Request request = StartDroneRequest(true);
-    developer.log("Request : " + request.toJsonString());
-
-    networkControl.sendRequest(request);
-    waitingArm = true;
-
-    // TIMER ATTENDRE ARM
-
-    //   Response response = await networkControl.receiveResponse(timeout: const Duration(seconds: 10));
-    //   if (response.responseType != ResponseTypes.ANSWER) {
-    //     return Future.error("error");
-    //   }
-    //   AnswerResponse answer = response as AnswerResponse;
-    //   if (!answer.validated) {
-    //     // Should never happen
-    //     return Future.error("Server does not validate the acknowledgement");
-    //   }
-    // } catch (e, s) {
-    //   developer.log("Error while ack", error: e);
-    //   print("Error in armDrone" + s.toString() );
-    //   return Future.error(e.toString());
-    // } /*finally {
-    //   networkControl.close();
-    // }*/
-  }
-
-  Future<void> disarmDrone() async{
-    // try {
-    Request request = StartDroneRequest(false);
-    developer.log("Request : " + request.toJsonString());
-
-    networkControl.sendRequest(request);
-    waitingArm = true;
-
-
-    if (waitingArm) {
-      await Future.doWhile(() => Future.delayed(const Duration(milliseconds: 100)).then((_) => !waitingArm));
-    }
-    //   Response response = await networkControl.receiveResponse(timeout: const Duration(seconds: 10));
-    //
-    //   if (response.responseType != ResponseTypes.ANSWER) {
-    //     return Future.error("error");
-    //   }
-    //   AnswerResponse answer = response as AnswerResponse;
-    //   if (!answer.validated) {
-    //     // Should never happen
-    //     return Future.error("Server does not validate the acknowledgement");
-    //   }
-    // } catch (e, s) {
-    //   developer.log("Error while ack", error: e);
-    //   developer.log("Error in disarmDrone", error: s );
-    //
-    //   return Future.error(e.toString());
-    // }
-  }
-
-  Future<void> startRecording() async{
-    // try {
-    Request request = RecordRequest(true);
-    developer.log("Request : " + request.toJsonString());
-
-    networkControl.sendRequest(request);
-    waitingRec = true;
-    //   Response response = await networkControl.receiveResponse(timeout: const Duration(seconds: 10));
-    //   if (response.responseType != ResponseTypes.ANSWER) {
-    //     return Future.error("error");
-    //   }
-    //   AnswerResponse answer = response as AnswerResponse;
-    //   if (!answer.validated) {
-    //     // Should never happen
-    //     return Future.error("Server does not validate the acknowledgement");
-    //   }
-    // } catch (e) {
-    //   developer.log("Error while ack", error: e);
-    //   return Future.error(e.toString());
-    // }
-  }
-
   Future<void> endRecording() async{
-    // try {
+    try {
     Request request = RecordRequest(false);
     developer.log("Request : " + request.toJsonString());
 
     networkControl.sendRequest(request);
-    waitingRec = true;
-    //   Response response = await networkControl.receiveResponse(timeout: const Duration(seconds: 10));
-    //   if (response.responseType != ResponseTypes.ANSWER) {
-    //     return Future.error("error");
-    //   }
-    //   AnswerResponse answer = response as AnswerResponse;
-    //   if (!answer.validated) {
-    //     // Should never happen
-    //     return Future.error("Server does not validate the acknowledgement");
-    //   }
-    // } catch (e,s) {
-    //   developer.log("Error while ack", error: e);
-    //   developer.log("Error while ack", error: s.runtimeType);
-    //   return Future.error(e.toString());
-    // }
+    // waitingRec = true;
+      Response response = await networkControl.receiveResponse(timeout: const Duration(seconds: 10));
+      if (response.responseType != ResponseTypes.RECORD) {
+        return Future.error("error");
+      }
+      AnswerResponse answer = response as AnswerResponse;
+      if (!answer.validated) {
+        // Should never happen
+        return Future.error("Server does not validate the acknowledgement");
+      }
+    } catch (e,s) {
+      developer.log("Error while ack", error: e);
+      developer.log("Error while ack", error: s.runtimeType);
+      return Future.error(e.toString());
+    }
   }
 
   Future<void> sendDroneControl(DroneControlRequest control) async{
@@ -171,6 +171,26 @@ class DroneCommunication {
       networkControl.sendRequest(control);
     } catch (e) {
       developer.log("Error while ack", error: e);
+      return Future.error(e.toString());
+    }
+  }
+
+  Future<DroneData> getDroneData() async{
+    try {
+      Request request = DroneInfoRequest();
+      developer.log("Request : " + request.toJsonString());
+
+      networkControl.sendRequest(request);
+      // waitingRec = true;
+      Response response = await networkControl.receiveResponse(timeout: const Duration(seconds: 5));
+      if (response.responseType != ResponseTypes.DRONE_DATA) {
+        return Future.error("error -- ResponseType isn't the expected one");
+      }
+      DroneData answer = response as DroneData;
+      return answer;
+    } catch (e,s) {
+      developer.log("Error while ack", error: e);
+      developer.log("Error while ack", error: s.runtimeType);
       return Future.error(e.toString());
     }
   }
@@ -195,7 +215,7 @@ class DroneCommunication {
   //   }
   // }
 
-  Future<void> updateDroneData() async {
+  /*Future<void> updateDroneData() async {
     waitingArm = false;
     waitingRec = false;
     control = DroneControl();
@@ -204,7 +224,7 @@ class DroneCommunication {
       print("loop");
         print("works ");
         Response response = await networkControl.receiveResponse(
-            timeout: const Duration(seconds: 10));
+            timeout: const Duration(milliseconds: 50));
         print("resp " + response.responseType.toString());
         if (response.responseType == ResponseTypes.DRONE_DATA) {
           DroneData data = response as DroneData;
@@ -212,7 +232,7 @@ class DroneCommunication {
           print("altitude -> " + control.altitude.toString());
           //TODO
         }
-        else if (response.responseType == ResponseTypes.ANSWER) {
+        else if (response.responseType == ResponseTypes.START_DRONE) {
           AnswerResponse answer = response as AnswerResponse;
           if (answer.name == ResponseTypes.DRONE_STATE.value && waitingArm) {
             print("testArm");
@@ -292,6 +312,6 @@ class DroneCommunication {
     //     }
     //   }
     // }
-  }
+  }*/
 
 }

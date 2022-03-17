@@ -8,9 +8,9 @@ class DroneControl{
   bool isArmed = false;
   bool isRecording = false;
 
-  double altitude = 0;
+  int altitude = 0;
   double speed = 0;
-  double position = 0;
+  String position = "unknown";
 
 
   static final DroneControl _droneControl = DroneControl._internal();
@@ -22,7 +22,7 @@ class DroneControl{
 
   DroneControl._internal();
 
-  void updateData(double position, double altitude, double speed){
+  void updateData(String position, int altitude, double speed){
     this.position = position;
     this.altitude = altitude;
     this.speed = speed;

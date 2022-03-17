@@ -19,7 +19,7 @@ class DroneControlSender {
 
   Future<void> sendDroneControl() async {
     print("starting sendDroneControl");
-    Timer.periodic(const Duration(milliseconds: 200), (timer) {
+    Timer.periodic(const Duration(milliseconds: 500), (timer) {
       //print("control := " + control.isArmed.toString());
       print("entering in timer periodic sendDroneControl");
 

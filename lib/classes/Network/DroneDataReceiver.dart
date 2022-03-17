@@ -13,20 +13,20 @@ class DroneDataReceiver {
     control = DroneControl();
   }
 
-  Future<void> updateDroneData() async {
-    // while(true){
-    //   await communication.updateDroneData();
-    //
-    // }
-
-    Timer.periodic(const Duration(milliseconds: 200), (timer) async {
-      //print("control := " + control.isArmed.toString());
-      if(control.isArmed){
-          await communication.updateDroneData();
-          print("test");
-      }
-
-    });
-  }
+  // Future<void> updateDroneData() async {
+  //   // while(true){
+  //   //   await communication.updateDroneData();
+  //   //
+  //   // }
+  //
+  //   Timer.periodic(const Duration(milliseconds: 200), (timer) async {
+  //     //print("control := " + control.isArmed.toString());
+  //     if(control.isArmed){
+  //         await communication.updateDroneData();
+  //         print("test");
+  //     }
+  //
+  //   });
+  // }
 
 }

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math';
 import 'dart:ui';
 import 'dart:ui';
@@ -12,6 +13,7 @@ import 'package:droneapp/widgets/util/ToastUtil.dart';
 import 'package:flutter/material.dart';
 import 'package:control_pad/control_pad.dart';
 import 'package:flutter/painting.dart';
+import '../classes/CommunicationAPI/responses/DroneData.dart';
 import '../classes/DroneCommunication.dart';
 import '../main.dart';
 
@@ -43,21 +45,46 @@ class _JoystickState extends State{
   void initState() {
     super.initState();
     sender.sendDroneControl();
-    //receiver.updateDroneData();
-    droneCommunication.updateDroneData();
+    updateDroneData();
+  }
+
+  Future<void> updateDroneData() async {
+    Timer.periodic(const Duration(seconds: 2), (timer) async {
+      if(control.isArmed){
+        DroneData data = await droneCommunication.getDroneData();
+        setState(() {
+          control.altitude = data.relativeAlt;
+          control.speed = sqrt( pow(data.vx, 2) + pow(data.vy, 2) + pow(data.vz, 2) );
+          control.position = (data.lat/10000000).toString() +" "+ (data.lon/10000000).toString();
+        });
+      }
+      else{
+        setState(() {
+          control.altitude = 0;
+          control.speed = 0.0;
+          control.position="unknown";
+        });
+
+      }
+
+
+
+    });
   }
 
   void _switchArm(){
     setState(() {
       //control.switchArm();
+      armButtonColor = Colors.blue;
+      print(control.isArmed);
       if (control.isArmed == false) {
-        armButtonColor = Colors.blue;
         droneCommunication.armDrone()
             .then((void _) {
-              armButtonColor = Colors.green;
-              print("control arm -> " + control.isArmed.toString());
-              (context as Element).reassemble();
-            })
+          armButtonColor = Colors.green;
+          control.arm();
+          print("control arm -> " + control.isArmed.toString());
+          (context as Element).reassemble();
+        })
             .catchError((e) {
           ToastUtil.showToast(context, "Error while Arming Drone : " + e.toString());
           armButtonColor = Colors.red;
@@ -91,6 +118,7 @@ class _JoystickState extends State{
       control.switchRecording();
       if (control.isRecording == true) {
         recordButtonColor = Colors.blue;
+        (context as Element).reassemble();
         droneCommunication.startRecording()
             .then((void _) {
           recordButtonColor = Colors.green;
@@ -107,6 +135,7 @@ class _JoystickState extends State{
       }
       else {
         recordButtonColor = Colors.blue;
+        (context as Element).reassemble();
         droneCommunication.endRecording()
             .then((void _) {
           recordButtonColor = Colors.red;
@@ -201,7 +230,7 @@ class _JoystickState extends State{
                       SizedBox(width: 50),// <-- Set height
 
                       RotatedBox(quarterTurns: -1, child: Text('Altitude : ' + control.altitude.toString(), style: TextStyle(fontSize: 15, color: Colors.black),)),
-                      RotatedBox(quarterTurns: -1, child: Text("Vitesse sol : " + control.speed.toString(), style: TextStyle(fontSize: 15, color: Colors.black))),
+                      RotatedBox(quarterTurns: -1, child: Text("Vitesse sol : " + control.speed.toStringAsFixed(2), style: TextStyle(fontSize: 15, color: Colors.black))),
                       RotatedBox(quarterTurns: -1, child: Text("Position : " + control.position.toString(),style: TextStyle(fontSize: 15, color: Colors.black))),
 
                     ],
@@ -219,6 +248,7 @@ class _JoystickState extends State{
               children: [
                 SizedBox(height: 70),// <-- Set height
                 RotatedBox(quarterTurns: -1, child: PadButtonsView(
+
                   backgroundPadButtonsColor: Colors.grey,
                   buttonsPadding: 8,
                   padButtonPressedCallback: droneController,

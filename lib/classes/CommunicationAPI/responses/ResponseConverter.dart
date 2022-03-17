@@ -1,6 +1,7 @@
 
 import 'dart:convert';
 
+import 'package:droneapp/classes/CommunicationAPI/responses/AckAnswer.dart';
 import 'package:droneapp/classes/CommunicationAPI/responses/AnswerResponse.dart';
 import 'package:droneapp/classes/CommunicationAPI/responses/Response.dart';
 import 'package:droneapp/classes/CommunicationAPI/responses/ResponseTypes.dart';
@@ -27,12 +28,14 @@ class ResponseConverter {
     );
 
     switch(type) {
-      case ResponseTypes.ANSWER:
+      case ResponseTypes.START_DRONE:
          return answerFromContent(content);
-      case ResponseTypes.DRONE_STATE:
-      // TODO implement this converter
+      case ResponseTypes.ACK:
+      return ackFromContent(content);
      case ResponseTypes.DRONE_DATA:
        return droneDataFromContent(content);
+      case ResponseTypes.RECORD:
+        return answerFromContent(content);
       default:
         throw UnimplementedError("Type $typeStr does not have a converter for now");
     }
@@ -40,21 +43,27 @@ class ResponseConverter {
 }
 
 AnswerResponse answerFromContent(Map<String, dynamic> content) {
-  String name = content["name"];
   String message = content["message"];
   bool validated = content["validated"];
-  return AnswerResponse(name, validated, message);
+  return AnswerResponse( validated, message);
+}
+
+AckAnswer ackFromContent(Map<String, dynamic> content) {
+  String message = content["message"];
+  bool validated = content["validated"];
+  return AckAnswer( validated, message);
 }
 
 DroneData droneDataFromContent(Map<String, dynamic> content){
   int batteryRemaining = content["batteryRemaining"];
-  int lat = content["batteryRemaining"];
-  int lon = content["batteryRemaining"];
-  int alt = content["batteryRemaining"];
-  int relativeAlt = content["batteryRemaining"];
-  int vx = content["batteryRemaining"];
-  int vy = content["batteryRemaining"];
-  int vz = content["batteryRemaining"];
-  int yawRotation = content["batteryRemaining"];
+  int lat = content["lat"];
+  int lon = content["lon"];
+  int alt = content["alt"];
+  int relativeAlt = content["relativeAlt"];
+  int vx = content["vx"];
+  int vy = content["vy"];
+  int vz = content["vz"];
+  int yawRotation = content["yawRotation"];
   return DroneData(batteryRemaining, lat.toDouble(), lon.toDouble(), alt, relativeAlt, vx, vy, vz, yawRotation);
 }
+
