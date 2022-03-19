@@ -8,6 +8,7 @@ import 'package:control_pad/models/pad_button_item.dart';
 import 'package:droneapp/classes/DroneControl.dart';
 import 'package:droneapp/classes/Network/DroneControlSender.dart';
 import 'package:droneapp/classes/Network/DroneDataReceiver.dart';
+import 'package:droneapp/widgets/DroneDataWidget.dart';
 import 'package:droneapp/widgets/connexion.dart';
 import 'package:droneapp/widgets/util/ToastUtil.dart';
 import 'package:flutter/material.dart';
@@ -34,7 +35,6 @@ class _JoystickState extends State{
   DroneControl control = DroneControl();
   double PI = 3.141592653589793238;
   DroneControlSender sender = DroneControlSender();
-  DroneDataReceiver receiver = DroneDataReceiver();
 
 
   Color armButtonColor = Colors.red;
@@ -45,7 +45,7 @@ class _JoystickState extends State{
   void initState() {
     super.initState();
     sender.sendDroneControl();
-    updateDroneData();
+    //updateDroneData();
   }
 
   Future<void> updateDroneData() async {
@@ -115,38 +115,39 @@ class _JoystickState extends State{
 
   void _switchRecord(){
     setState(() {
-      control.switchRecording();
-      if (control.isRecording == true) {
+      //control.switchRecording();
+      if (control.isRecording == false) {
         recordButtonColor = Colors.blue;
-        (context as Element).reassemble();
         droneCommunication.startRecording()
             .then((void _) {
+          print("truc");
+          control.switchRecording();
           recordButtonColor = Colors.green;
-          print("control arm -> " + control.isRecording.toString());
+          print("control arm true-> " + control.isRecording.toString());
           (context as Element).reassemble();
         })
             .catchError((e) {
           ToastUtil.showToast(context, "Error while Starting Record: " + e.toString());
           recordButtonColor = Colors.red;
           control.endRecord();
-          print("control rec -> " + control.isRecording.toString());
+          print("control rec false -> " + control.isRecording.toString());
           (context as Element).reassemble();
         });
       }
       else {
         recordButtonColor = Colors.blue;
-        (context as Element).reassemble();
         droneCommunication.endRecording()
             .then((void _) {
           recordButtonColor = Colors.red;
-          print("control arm -> " + control.isRecording.toString());
+          control.switchRecording();
+          print("control arm true -> " + control.isRecording.toString());
           (context as Element).reassemble();
         })
             .catchError((e) {
           ToastUtil.showToast(context, "Error while Ending Record: " + e.toString());
           recordButtonColor = Colors.green;
           control.startRecord();
-          print("control rec -> " + control.isRecording.toString());
+          print("control rec fakse-> " + control.isRecording.toString());
           (context as Element).reassemble();
         });
       }
@@ -218,33 +219,8 @@ class _JoystickState extends State{
         child:Row(
           children : [
             const SizedBox(width: 20),// <-- Set height
+            DroneDataWidget(),
             Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Container(
-                  width: 150,
-                  height: 300,
-                  child: Row(
-                    children:  [
-                      SizedBox(width: 50),// <-- Set height
-
-                      RotatedBox(quarterTurns: -1, child: Text('Altitude : ' + control.altitude.toString(), style: TextStyle(fontSize: 15, color: Colors.black),)),
-                      RotatedBox(quarterTurns: -1, child: Text("Vitesse sol : " + control.speed.toStringAsFixed(2), style: TextStyle(fontSize: 15, color: Colors.black))),
-                      RotatedBox(quarterTurns: -1, child: Text("Position : " + control.position.toString(),style: TextStyle(fontSize: 15, color: Colors.black))),
-
-                    ],
-                  ),
-                  decoration: BoxDecoration(
-                      border: Border.all(color: Colors.grey)
-                  ),
-
-                ),
-
-              ],
-            ),
-            Column(
-
               children: [
                 SizedBox(height: 70),// <-- Set height
                 RotatedBox(quarterTurns: -1, child: PadButtonsView(

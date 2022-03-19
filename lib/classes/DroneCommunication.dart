@@ -128,15 +128,19 @@ class DroneCommunication {
     networkControl.sendRequest(request);
     // waitingRec = true;
       Response response = await networkControl.receiveResponse(timeout: const Duration(seconds: 10));
+      print(response.responseType );
       if (response.responseType != ResponseTypes.RECORD) {
+        print("error 1");
         return Future.error("error");
       }
       AnswerResponse answer = response as AnswerResponse;
       if (!answer.validated) {
         // Should never happen
+        print("error 2");
         return Future.error("Server does not validate the acknowledgement");
       }
     } catch (e) {
+      print("error 3");
       developer.log("Error while ack", error: e);
       return Future.error(e.toString());
     }
