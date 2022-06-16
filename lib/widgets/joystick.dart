@@ -221,7 +221,7 @@ class _JoystickState extends State{
             Column(
               children: [
                 SizedBox(height: 70),// <-- Set height
-                RotatedBox(quarterTurns: -1, child: PadButtonsView(
+                 PadButtonsView(
 
                   backgroundPadButtonsColor: Colors.grey,
                   buttonsPadding: 8,
@@ -273,7 +273,7 @@ class _JoystickState extends State{
                     )
 
                   ],
-                )),
+                ),
                 const SizedBox(height: 100),
                 Row(
                   children: [
