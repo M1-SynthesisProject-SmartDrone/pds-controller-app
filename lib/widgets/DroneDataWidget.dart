@@ -24,8 +24,8 @@ class _DroneDataWidget extends State{
 
   @override
   void dispose() {
-    super.dispose();
     stopLoops = true;
+    super.dispose();
   }
 
 @override
@@ -37,7 +37,7 @@ class _DroneDataWidget extends State{
 
   Future<void> updateDroneData() async {
     Timer.periodic(const Duration(seconds: 2), (timer) async {
-      if(control.isArmed){
+      if(control.isArmed && (mounted)){
         DroneData data = await droneCommunication.getDroneData();
         setState(() {
           control.altitude = data.relativeAlt;
@@ -46,11 +46,14 @@ class _DroneDataWidget extends State{
         });
       }
       else{
-        setState(() {
-          control.altitude = 0;
-          control.speed = 0.0;
-          control.position="unknown";
-        });
+        if(mounted){
+          setState(() {
+            control.altitude = 0;
+            control.speed = 0.0;
+            control.position="unknown";
+          });
+        }
+
       }
       if(stopLoops){
         timer.cancel();
