@@ -51,7 +51,7 @@ class TrajetSelectionState extends State{
                       return Card(
                         child: ListTile(
                           title: Text(paths.pathList[index].name),
-                          subtitle: Text(paths.pathList[index].name),
+                          subtitle: Text(paths.pathList[index].date),
                           onTap: () {
                             Navigator.pushNamed(context, Trajet.routename,
                                 arguments: paths.pathList[index].id);

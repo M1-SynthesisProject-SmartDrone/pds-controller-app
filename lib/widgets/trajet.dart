@@ -61,7 +61,7 @@ class TrajetState extends State{
                           alignment: Alignment.center,
                           child: Column(
                             children: [
-                              Text("id trajet :" + data.id.toString()),
+                              Text("id trajet :" +args.toString()),
                               Text("nom trajet :" + data.name.toString()),
                               Text("date de création :" + data.date.toString()),
                               Text("nombre de Points :" + data.nbPoints.toString()),
@@ -77,7 +77,7 @@ class TrajetState extends State{
                                 ),
                                 onPressed: () {
                                   DroneCommunication communication = DroneCommunication();
-                                  communication.launchPath(data.id);
+                                  communication.launchPath(args);
                                   Navigator.push(context, MaterialPageRoute(builder: (context) => const AutomaticPilotView()));
 
                                 },
