@@ -35,6 +35,7 @@ class _JoystickState extends State{
   DroneControl control = DroneControl();
   double PI = 3.141592653589793238;
   DroneControlSender sender = DroneControlSender();
+  bool stopLoops = false;
 
 
   Color armButtonColor = Colors.red;
@@ -286,8 +287,9 @@ class _JoystickState extends State{
                             backgroundColor: MaterialStateProperty.all<Color>(armButtonColor)
                         ),child: new Text("Arm"))),
                     RotatedBox(quarterTurns: -1, child:TextButton(onPressed: (){
+                      sender.endSendDroneControl();
                       Navigator.pop(context);
-                      // TODO finish end properly
+
                       }, child: Icon(Icons.arrow_back_sharp))),
 
                   ],

@@ -10,11 +10,15 @@ class DroneControlSender {
 
   late DroneControl control;
   late DroneCommunication communication;
-
+  bool stopLoop = false;
 
   DroneControlSender() {
     communication = DroneCommunication();
     control = DroneControl();
+  }
+
+  void endSendDroneControl(){
+    stopLoop = true;
   }
 
   Future<void> sendDroneControl() async {
@@ -28,7 +32,9 @@ class DroneControlSender {
         DroneControlRequest req = DroneControlRequest(control.x, control.y ,control.z ,control.r);
         communication.sendDroneControl(req);
       }
-
+      if(stopLoop){
+        timer.cancel();
+      }
     });
   }
 

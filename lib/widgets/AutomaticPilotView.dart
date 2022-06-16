@@ -20,7 +20,6 @@ class AutomaticPilotState extends State {
   double latitude = 0;
   double longitude= 0;
   int altitude= 0;
-
   @override
   void initState() {
     super.initState();

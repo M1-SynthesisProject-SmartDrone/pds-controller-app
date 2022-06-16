@@ -20,8 +20,13 @@ class _DroneDataWidget extends State{
 
   DroneCommunication droneCommunication= DroneCommunication();
   DroneControl control = DroneControl();
+  bool stopLoops = false;
 
-
+  @override
+  void dispose() {
+    super.dispose();
+    stopLoops = true;
+  }
 
 @override
   void initState() {
@@ -46,6 +51,9 @@ class _DroneDataWidget extends State{
           control.speed = 0.0;
           control.position="unknown";
         });
+      }
+      if(stopLoops){
+        timer.cancel();
       }
     });
   }
