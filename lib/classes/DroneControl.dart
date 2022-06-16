@@ -94,7 +94,7 @@ class DroneControl{
 
   void setDirection(double x, double y){
     this.y = x;
-    this.x = y;
+    this.x = -y;
   }
 
   void resetDirection(){
