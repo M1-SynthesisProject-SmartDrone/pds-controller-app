@@ -38,13 +38,13 @@ class ResponseConverter {
 
     switch(type) {
       case ResponseTypes.START_DRONE:
-         return answerFromContent(content);
+         return answerFromContent(content,ResponseTypes.START_DRONE );
       case ResponseTypes.ACK:
       return ackFromContent(content);
      case ResponseTypes.DRONE_DATA:
        return droneDataFromContent(content);
-      case ResponseTypes.RECORD:
-        return answerFromContent(content);
+      case ResponseTypes.RESP_RECORD:
+        return answerFromContent(content, ResponseTypes.RESP_RECORD);
       case ResponseTypes.RESP_PATH_GET:
         return pathListFromContent(content['paths']);
       case ResponseTypes.RESP_PATH_ONE:
@@ -92,10 +92,10 @@ PathListAnswer pathListFromContent(List< dynamic> content){
   return PathListAnswer(eltList.cast<PathDescription>());
 }
 
-AnswerResponse answerFromContent(Map<String, dynamic> content) {
+AnswerResponse answerFromContent(Map<String, dynamic> content, ResponseTypes type) {
   String message = content["message"];
   bool validated = content["validated"];
-  return AnswerResponse( validated, message);
+  return AnswerResponse( validated, message, type);
 }
 
 AckAnswer ackFromContent(Map<String, dynamic> content) {

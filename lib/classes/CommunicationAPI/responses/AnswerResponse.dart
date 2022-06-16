@@ -6,6 +6,6 @@ class AnswerResponse extends Response {
   final bool validated;
   final String message;
 
-  AnswerResponse(this.validated, this.message) : super(ResponseTypes.START_DRONE);
+  AnswerResponse(this.validated, this.message, ResponseTypes type) : super(type);
 }
 

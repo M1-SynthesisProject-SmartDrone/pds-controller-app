@@ -119,7 +119,7 @@ class _JoystickState extends State{
         droneCommunication.startRecording()
             .then((void _) {
           print("truc");
-          control.switchRecording();
+          control.startRecord();
           recordButtonColor = Colors.green;
           print("control arm true-> " + control.isRecording.toString());
           (context as Element).reassemble();
@@ -137,7 +137,7 @@ class _JoystickState extends State{
         droneCommunication.endRecording()
             .then((void _) {
           recordButtonColor = Colors.red;
-          control.switchRecording();
+          control.endRecord();
           print("control arm true -> " + control.isRecording.toString());
           (context as Element).reassemble();
         })

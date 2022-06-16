@@ -3,7 +3,7 @@ enum ResponseTypes {
   START_DRONE,
   DRONE_DATA,
   DRONE_STATE,
-  RECORD,
+  RESP_RECORD,
   ACK,
   RESP_PATH_GET,
   RESP_PATH_ONE,
@@ -24,7 +24,7 @@ extension ResponseTypesValues on ResponseTypes {
         return "RESP_DRONE_INFOS";
       case ResponseTypes.DRONE_STATE:
         return "RESP_DRONE_STATE";
-      case ResponseTypes.RECORD:
+      case ResponseTypes.RESP_RECORD:
         return "RESP_RECORD";
       case ResponseTypes.RESP_PATH_GET:
         return "RESP_PATH_GET";

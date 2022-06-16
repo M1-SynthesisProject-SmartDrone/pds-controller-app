@@ -205,8 +205,8 @@ class DroneCommunication {
     // waitingRec = true;
       Response response = await networkControl.receiveResponse(timeout: const Duration(seconds: 10));
       print(response.responseType );
-      if (response.responseType != ResponseTypes.RECORD) {
-        print("error 1");
+      if (response.responseType != ResponseTypes.RESP_RECORD) {
+        print("error 1" + response.responseType.toString());
         return Future.error("error");
       }
       AnswerResponse answer = response as AnswerResponse;
@@ -230,8 +230,8 @@ class DroneCommunication {
     networkControl.sendRequest(request);
     // waitingRec = true;
       Response response = await networkControl.receiveResponse(timeout: const Duration(seconds: 10));
-      if (response.responseType != ResponseTypes.RECORD) {
-        return Future.error("error");
+      if (response.responseType != ResponseTypes.RESP_RECORD) {
+        return Future.error("error" + response.responseType.toString());
       }
       AnswerResponse answer = response as AnswerResponse;
       if (!answer.validated) {
