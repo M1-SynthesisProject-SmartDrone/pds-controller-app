@@ -4,7 +4,13 @@ enum ResponseTypes {
   DRONE_DATA,
   DRONE_STATE,
   RECORD,
-  ACK
+  ACK,
+  RESP_PATH_GET,
+  RESP_PATH_ONE,
+  RESP_AUTOPILOT_INFOS,
+  RESP_PATH_LAUNCH,
+  RESP_REGAIN_CONTROL,
+  RESP_RESUME_AUTOPILOT
 }
 
 extension ResponseTypesValues on ResponseTypes {
@@ -20,6 +26,18 @@ extension ResponseTypesValues on ResponseTypes {
         return "RESP_DRONE_STATE";
       case ResponseTypes.RECORD:
         return "RESP_RECORD";
+      case ResponseTypes.RESP_PATH_GET:
+        return "RESP_PATH_GET";
+      case ResponseTypes.RESP_PATH_ONE:
+        return "RESP_PATH_ONE";
+      case ResponseTypes.RESP_PATH_LAUNCH:
+        return "RESP_PATH_LAUNCH";
+      case ResponseTypes.RESP_AUTOPILOT_INFOS:
+        return "RESP_AUTOPILOT_INFOS";
+      case ResponseTypes.RESP_REGAIN_CONTROL:
+        return "RESP_REGAIN_CONTROL";
+      case ResponseTypes.RESP_RESUME_AUTOPILOT:
+        return "RESP_RESUME_AUTOPILOT";
       default:
         return "";
     }

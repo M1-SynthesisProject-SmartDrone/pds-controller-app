@@ -3,12 +3,21 @@ import 'dart:developer' as developer;
 import 'dart:io';
 
 import 'package:droneapp/classes/CommunicationAPI/requests/AckRequest.dart';
+import 'package:droneapp/classes/CommunicationAPI/requests/AutopilotInfosRequest.dart';
 import 'package:droneapp/classes/CommunicationAPI/requests/DroneInfoRequest.dart';
+import 'package:droneapp/classes/CommunicationAPI/requests/PathInfosRequest.dart';
+import 'package:droneapp/classes/CommunicationAPI/requests/PathLaunchRequest.dart';
+import 'package:droneapp/classes/CommunicationAPI/requests/PathListRequest.dart';
 import 'package:droneapp/classes/CommunicationAPI/requests/RecordRequest.dart';
 import 'package:droneapp/classes/CommunicationAPI/requests/Request.dart';
 import 'package:droneapp/classes/CommunicationAPI/requests/StartDroneRequest.dart';
 import 'package:droneapp/classes/CommunicationAPI/responses/AckAnswer.dart';
 import 'package:droneapp/classes/CommunicationAPI/responses/AnswerResponse.dart';
+import 'package:droneapp/classes/CommunicationAPI/responses/AutopilotInfosResponse.dart';
+import 'package:droneapp/classes/CommunicationAPI/responses/OnePathAnswer.dart';
+import 'package:droneapp/classes/CommunicationAPI/responses/PathInfosResponse.dart';
+import 'package:droneapp/classes/CommunicationAPI/responses/PathLaunchResponse.dart';
+import 'package:droneapp/classes/CommunicationAPI/responses/PathListAnswer.dart';
 import 'package:droneapp/classes/CommunicationAPI/responses/Response.dart';
 import 'package:droneapp/classes/CommunicationAPI/responses/ResponseTypes.dart';
 import 'package:droneapp/classes/DroneControl.dart';
@@ -58,6 +67,73 @@ class DroneCommunication {
       }
     } catch (e) {
       developer.log("Error while ack", error: e);
+      return Future.error(e.toString());
+    }
+  }
+
+  Future<void> launchPath(int id) async{
+    try{
+      Request request = PathLaunchRequest(id);
+
+      networkControl.sendRequest(request);
+
+      Response response = await networkControl.receiveResponse(timeout: const Duration(seconds: 10));
+      if (response.responseType != ResponseTypes.RESP_PATH_LAUNCH) {
+        print("test");
+
+        return Future.error("error");
+      }
+      PathLaunchResponse answer = response as PathLaunchResponse;
+      if (!answer.validated) {
+        // Should never happen
+        return Future.error("Server does not validate the acknowledgement");
+      }
+    }catch (e, s) {
+      developer.log("Error while ack", error: e);
+      print("Error in armDrone" + s.toString() );
+      return Future.error(e.toString());
+    }
+  }
+
+
+  Future<AutopilotInfosResponse> getAutoPilotInfos() async {
+    try{
+      Request request = AutopilotInfosRequest();
+
+      networkControl.sendRequest(request);
+
+      Response response = await networkControl.receiveResponse(timeout: const Duration(seconds: 10));
+      if (response.responseType != ResponseTypes.RESP_AUTOPILOT_INFOS) {
+        print("test");
+
+        return Future.error("error");
+      }
+      AutopilotInfosResponse answer = response as AutopilotInfosResponse;
+      return answer;
+    }catch (e, s) {
+      developer.log("Error while ack", error: e);
+      print("Error in armDrone" + s.toString() );
+      return Future.error(e.toString());
+    }
+  }
+
+  Future<OnePathAnswer> getOnePath(int tripid) async{
+    try{
+      Request request = PathInfosRequest(tripid);
+
+      networkControl.sendRequest(request);
+
+      Response response = await networkControl.receiveResponse(timeout: const Duration(seconds: 10));
+      if (response.responseType != ResponseTypes.RESP_PATH_ONE) {
+        print("test");
+
+        return Future.error("error");
+      }
+      OnePathAnswer answer = response as OnePathAnswer;
+      return answer;
+    }catch (e, s) {
+      developer.log("Error while ack", error: e);
+      print("Error in armDrone" + s.toString() );
       return Future.error(e.toString());
     }
   }
@@ -185,7 +261,6 @@ class DroneCommunication {
       developer.log("Request : " + request.toJsonString());
 
       networkControl.sendRequest(request);
-      // waitingRec = true;
       Response response = await networkControl.receiveResponse(timeout: const Duration(seconds: 5));
       if (response.responseType != ResponseTypes.DRONE_DATA) {
         return Future.error("error -- ResponseType isn't the expected one");
@@ -199,123 +274,49 @@ class DroneCommunication {
     }
   }
 
+  Future<PathListAnswer> getPathList() async{
+    try {
+      Request request = PathListRequest();
+      developer.log("Request : " + request.toJsonString());
 
-  // Future<void> updateDroneData() async {
-  //   try {
-  //     Response response;
-  //     do {
-  //       response = await networkControl.receiveResponse(
-  //           timeout: const Duration(seconds: 10));
-  //     if (response.responseType != ResponseTypes.DRONE_DATA) {
-  //       return Future.error("error");
-  //     }
-  //     }while(response.responseType != ResponseTypes.DRONE_DATA);
-  //     DroneData data = response as DroneData;
-  //     DroneControl control = DroneControl();
-  //     control.altitude = data.relativeAlt as double;
-  //   } catch (e) {
-  //     developer.log("Error while ack", error: e);
-  //     return Future.error(e.toString());
-  //   }
-  // }
+      networkControl.sendRequest(request);
+      Response response = await networkControl.receiveResponse(timeout: const Duration(seconds: 5));
 
-  /*Future<void> updateDroneData() async {
-    waitingArm = false;
-    waitingRec = false;
-    control = DroneControl();
+      if (response.responseType != ResponseTypes.RESP_PATH_GET) {
+        return Future.error("error -- ResponseType isn't the expected one");
+      }
 
-    Timer.periodic(const Duration(milliseconds: 500), (timer) async {
-      print("loop");
-        print("works ");
-        Response response = await networkControl.receiveResponse(
-            timeout: const Duration(milliseconds: 50));
-        print("resp " + response.responseType.toString());
-        if (response.responseType == ResponseTypes.DRONE_DATA) {
-          DroneData data = response as DroneData;
-          control.altitude = data.relativeAlt.toDouble();
-          print("altitude -> " + control.altitude.toString());
-          //TODO
-        }
-        else if (response.responseType == ResponseTypes.START_DRONE) {
-          AnswerResponse answer = response as AnswerResponse;
-          if (answer.name == ResponseTypes.DRONE_STATE.value && waitingArm) {
-            print("testArm");
-            if (!answer.validated) {
-              // Should never happen
-              control.unArm();
-              waitingArm = false;
-              return Future.error(
-                  "Server does not validate the acknowledgement");
-            }
-            control.arm();
-            waitingArm = false;
-          }
-          else if (answer.name == ResponseTypes.RECORD.value && waitingRec) {
-            waitingRec = false;
-            if (!answer.validated) {
-              // Should never happen
-              return Future.error(
-                  "Server does not validate the acknowledgement");
-            }
-            if (control.isRecording) {
-              control.endRecord();
-            }
-            else {
-              control.startRecord();
-            }
-          }
-        }
+      PathListAnswer answer = response as PathListAnswer;
+      return answer;
+    } catch (e,s) {
+      developer.log("Error while ack", error: e);
+      developer.log("Error while ack", error: s);
+      return Future.error(e.toString());
+    }
+  }
 
-    });
-    // while(true) {
-    //   print("loop");
-    //   if (control.isArmed || waitingArm) {
-    //     print("works ");
-    //     Response response = await networkControl.receiveResponse(
-    //         timeout: const Duration(seconds: 10));
-    //     print("resp " + response.responseType.toString());
-    //     if (response.responseType == ResponseTypes.DRONE_DATA) {
-    //       DroneData data = response as DroneData;
-    //       control.altitude = data.relativeAlt.toDouble();
-    //       print("altitude -> " + control.altitude.toString());
-    //       //TODO
-    //     }
-    //     else if (response.responseType == ResponseTypes.ANSWER) {
-    //       AnswerResponse answer = response as AnswerResponse;
-    //       if (answer.name == ResponseTypes.DRONE_STATE.value && waitingArm) {
-    //         waitingArm = false;
-    //
-    //         print("testArm");
-    //         if (!answer.validated) {
-    //           // Should never happen
-    //           control.unArm();
-    //           return Future.error(
-    //               "Server does not validate the acknowledgement");
-    //         }
-    //         if (control.isArmed) {
-    //           control.unArm();
-    //         }
-    //         else {
-    //           control.arm();
-    //         }
-    //       }
-    //       else if (answer.name == ResponseTypes.RECORD.value && waitingRec) {
-    //         waitingRec = false;
-    //         if (!answer.validated) {
-    //           // Should never happen
-    //           return Future.error(
-    //               "Server does not validate the acknowledgement");
-    //         }
-    //         if (control.isRecording) {
-    //           control.endRecord();
-    //         }
-    //         else {
-    //           control.startRecord();
-    //         }
-    //       }
-    //     }
-    //   }
-    // }
-  }*/
+
+  Future<PathInfosResponse> getPathInfos(int id) async{
+    try {
+      Request request = PathInfosRequest(id);
+      developer.log("Request : " + request.toJsonString());
+
+      networkControl.sendRequest(request);
+      Response response = await networkControl.receiveResponse(timeout: const Duration(seconds: 5));
+
+      if (response.responseType != ResponseTypes.RESP_PATH_ONE) {
+        return Future.error("error -- ResponseType isn't the expected one");
+      }
+
+      PathInfosResponse answer = response as PathInfosResponse;
+      return answer;
+    } catch (e,s) {
+      developer.log("Error while ack", error: e);
+      developer.log("Error while ack", error: s);
+      return Future.error(e.toString());
+    }
+  }
+
+
 
 }

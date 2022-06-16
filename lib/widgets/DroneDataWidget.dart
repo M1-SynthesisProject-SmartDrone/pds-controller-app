@@ -46,11 +46,7 @@ class _DroneDataWidget extends State{
           control.speed = 0.0;
           control.position="unknown";
         });
-
       }
-
-
-
     });
   }
 

@@ -28,20 +28,8 @@ class NetworkControl {
   NetworkControl._internal();
 
   Future<void> updateDroneData() async {
-    // while(true){
-    //   await communication.updateDroneData();
-    //
-    // }
     control = DroneControl();
     communication = DroneCommunication();
-    // Timer.periodic(const Duration(milliseconds: 200), (timer) async {
-    //   //print("control := " + control.isArmed.toString());
-    //   if(control.isArmed){
-    //     await communication.updateDroneData();
-    //     print("test");
-    //   }
-    //
-    // });
   }
 
   void initConnection(String ipAddress, int port) {
@@ -50,10 +38,6 @@ class NetworkControl {
     developer.log(address.toString() + " " + port.toString(), name: "network.control");
   }
 
-
-/*  NetworkControl(String ipAddress, this.port) : address = InternetAddress(ipAddress, type: InternetAddressType.any) {
-    developer.log(address.toString() + " " + port.toString(), name: "network.control");
-  }*/
 
   Future<void> connect() async {
     udpSocket = await UdpSocket.bind(port);

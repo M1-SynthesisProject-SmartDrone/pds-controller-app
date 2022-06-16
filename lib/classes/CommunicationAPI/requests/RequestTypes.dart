@@ -4,7 +4,13 @@ enum RequestTypes {
   MANUAL_CONTROL,
   RECORD,
   DRONE_DATA,
-  DRONE_INFOS
+  DRONE_INFOS,
+  PATH_LIST,
+  PATH_ONE,
+  PATH_LAUNCH,
+  AUTOPILOT_INFOS,
+  REGAIN_CONTROL,
+  RESUME_AUTOPILOT
 }
 
 // Cannot infer values directly, that's a bit sad
@@ -23,6 +29,18 @@ extension RequestTypeValue on RequestTypes {
         return "DRONE_DATA";
       case RequestTypes.DRONE_INFOS:
         return "DRONE_INFOS";
+      case RequestTypes.PATH_LIST:
+        return "PATH_LIST";
+      case RequestTypes.PATH_ONE:
+        return "PATH_ONE";
+      case RequestTypes.PATH_LAUNCH:
+        return "PATH_LAUNCH";
+      case RequestTypes.AUTOPILOT_INFOS:
+        return "AUTOPILOT_INFOS";
+        case RequestTypes.REGAIN_CONTROL:
+      return "REGAIN_CONTROL";
+      case RequestTypes.RESUME_AUTOPILOT:
+        return "RESUME_AUTOPILOT";
       default:
         return "";
     }

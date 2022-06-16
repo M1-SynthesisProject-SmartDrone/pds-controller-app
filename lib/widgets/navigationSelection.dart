@@ -1,3 +1,4 @@
+import 'package:droneapp/classes/DroneCommunication.dart';
 import 'package:droneapp/widgets/connexion.dart';
 import 'package:droneapp/widgets/joystick.dart';
 import 'package:droneapp/widgets/trajet.dart';
@@ -12,6 +13,8 @@ class NavigationSelection extends StatelessWidget {
   Widget build(BuildContext context) {
     // Material is a conceptual piece
     // of paper on which the UI appears.
+    DroneCommunication communication = DroneCommunication();
+
     return MaterialApp(
       // Column is a vertical, linear layout.
       home: Scaffold(
@@ -52,6 +55,7 @@ class NavigationSelection extends StatelessWidget {
                           backgroundColor: MaterialStateProperty.all<Color>(Colors.blue)
                       ),
                       onPressed: () {
+                        communication.networkControl.close();
                         Navigator.pop(context);
                       },
                       child: Text('Deconnexion'),

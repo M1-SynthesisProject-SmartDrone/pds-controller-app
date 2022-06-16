@@ -48,7 +48,7 @@ class _JoystickState extends State{
     //updateDroneData();
   }
 
-  Future<void> updateDroneData() async {
+/*  Future<void> updateDroneData() async {
     Timer.periodic(const Duration(seconds: 2), (timer) async {
       if(control.isArmed){
         DroneData data = await droneCommunication.getDroneData();
@@ -66,11 +66,8 @@ class _JoystickState extends State{
         });
 
       }
-
-
-
     });
-  }
+  }*/
 
   void _switchArm(){
     setState(() {
@@ -288,7 +285,10 @@ class _JoystickState extends State{
                             foregroundColor: MaterialStateProperty.all<Color>(Colors.white),
                             backgroundColor: MaterialStateProperty.all<Color>(armButtonColor)
                         ),child: new Text("Arm"))),
-                    RotatedBox(quarterTurns: -1, child:TextButton(onPressed: (){ Navigator.pop(context); }, child: Icon(Icons.arrow_back_sharp))),
+                    RotatedBox(quarterTurns: -1, child:TextButton(onPressed: (){
+                      Navigator.pop(context);
+                      // TODO finish end properly
+                      }, child: Icon(Icons.arrow_back_sharp))),
 
                   ],
                 ),// <-- Set height

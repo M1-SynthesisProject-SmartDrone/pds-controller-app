@@ -1,10 +1,19 @@
 
 import 'dart:convert';
+import 'dart:ffi';
 
 import 'package:droneapp/classes/CommunicationAPI/responses/AckAnswer.dart';
 import 'package:droneapp/classes/CommunicationAPI/responses/AnswerResponse.dart';
+import 'package:droneapp/classes/CommunicationAPI/responses/AutopilotInfosResponse.dart';
+import 'package:droneapp/classes/CommunicationAPI/responses/OnePathAnswer.dart';
+import 'package:droneapp/classes/CommunicationAPI/responses/PathDescription.dart';
+import 'package:droneapp/classes/CommunicationAPI/responses/PathInfosResponse.dart';
+import 'package:droneapp/classes/CommunicationAPI/responses/PathLaunchResponse.dart';
+import 'package:droneapp/classes/CommunicationAPI/responses/PathListAnswer.dart';
 import 'package:droneapp/classes/CommunicationAPI/responses/Response.dart';
 import 'package:droneapp/classes/CommunicationAPI/responses/ResponseTypes.dart';
+import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import 'DroneData.dart';
 
@@ -36,10 +45,51 @@ class ResponseConverter {
        return droneDataFromContent(content);
       case ResponseTypes.RECORD:
         return answerFromContent(content);
+      case ResponseTypes.RESP_PATH_GET:
+        return pathListFromContent(content['paths']);
+      case ResponseTypes.RESP_PATH_ONE:
+        print("convert resp one path");
+        return pathOneFromContent(content);
+      case ResponseTypes.RESP_PATH_LAUNCH:
+        print("convert resp one path");
+        return pathLaunchResponseFromContent(content);
+      case ResponseTypes.RESP_AUTOPILOT_INFOS:
+        print("convert resp one path");
+        return autoPilotInfosFromContent(content);
       default:
         throw UnimplementedError("Type $typeStr does not have a converter for now");
     }
   }
+}
+
+AutopilotInfosResponse autoPilotInfosFromContent(Map<String, dynamic> content){
+  return AutopilotInfosResponse.fromJson(content);
+}
+
+PathLaunchResponse pathLaunchResponseFromContent(Map<String, dynamic> content){
+  return PathLaunchResponse.fromJson(content);
+}
+
+OnePathAnswer pathOneFromContent(Map<String, dynamic> content){
+  print(content.entries.toString());
+  return OnePathAnswer.fromJson(content);
+  int id = content['id'];
+  String name = content['name'];
+  String date = content['date'];
+  int nbPoints = content['nbPoints'];
+  int nbCheckpoints = content['nbCheckpoints'];
+  String lat = content['lat'];
+  String lng = content['lon'];
+  String alt = content['alt'];
+  return OnePathAnswer(id, name, date, nbPoints, nbCheckpoints, lat, lng, alt );
+}
+
+PathListAnswer pathListFromContent(List< dynamic> content){
+  // List eltList = [];
+  // content.forEach((key, value) => eltList.add(PathDescription.fromJson(value)));
+  List eltList = [];
+  content.forEach((element) => eltList.add(PathDescription.fromJson(element)));
+  return PathListAnswer(eltList.cast<PathDescription>());
 }
 
 AnswerResponse answerFromContent(Map<String, dynamic> content) {
